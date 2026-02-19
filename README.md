@@ -12,6 +12,7 @@ Loomis is a modern SaaS platform designed for courier and logistics businesses. 
 
 ## Tech Stack
 
+<p align="center">
 <img src="https://img.shields.io/badge/Google%20ADK-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google ADK"/>
 <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
 <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#"/>
@@ -23,6 +24,7 @@ Loomis is a modern SaaS platform designed for courier and logistics businesses. 
 <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/>
 <img src="https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini"/>
 <img src="https://img.shields.io/badge/Pub%2FSub-336791?style=for-the-badge&logo=google-cloud&logoColor=white" alt="Pub/Sub"/>
+</p>
 
 ---
 
