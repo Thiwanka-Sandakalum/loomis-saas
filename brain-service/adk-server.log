@@ -1,0 +1,19 @@
+nohup: ignoring input
+
+> loomis@1.0.0 api
+> npx tsc && npx adk api_server dist/agent.js
+
+[dotenv@17.2.4] injecting env (5) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
++-----------------------------------------------------------------------------+
+| ADK Web Server started                                                      |
+|                                                                             |
+| For local testing, access at http://thiwa-ThinkPad-T460s:8000.              |
++-----------------------------------------------------------------------------+
+[dotenv@17.2.4] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Status Simulator started.
+Connected to MongoDB Atlas!
+[32m[ADK INFO]:[0m event:  {"invocationId":"e-38246190-cf25-4352-9274-655a54757d3c","author":"user","actions":{"stateDelta":{},"artifactDelta":{},"requestedAuthConfigs":{},"requestedToolConfirmations":{}},"content":{"role":"user","parts":[{"text":"I want to send a package from New York to Los Angeles"}]},"id":"E2x8LmKQ","longRunningToolIds":[],"timestamp":1771393722932}
+[32m[ADK INFO]:[0m Sending out request, model: gemini-2.5-flash, backend: GEMINI_API, stream: false
+[32m[ADK INFO]:[0m Sending out request, model: gemini-2.5-flash, backend: GEMINI_API, stream: false
+Killed

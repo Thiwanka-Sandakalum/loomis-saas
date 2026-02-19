@@ -1,0 +1,32 @@
+{
+  "name": "loomis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web": "npx tsc && adk web dist/agent.js",
+    "run": "npx tsc && adk run dist/agent.js",
+    "api": "npx tsc && npx adk api_server --allow_origins \"*\" dist/agent.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@google/adk": "^0.3.0",
+    "@google/adk-devtools": "^0.3.0",
+    "axios": "^1.7.9",
+    "dotenv": "^17.2.4",
+    "express": "^5.0.1",
+    "mongodb": "^7.1.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.2.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

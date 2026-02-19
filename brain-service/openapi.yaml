@@ -1,0 +1,1852 @@
+{
+  "openapi": "3.0.4",
+  "info": { "title": "CoreCourierService.Api", "version": "1.0" },
+  "paths":
+    {
+      "/api/ai/shipments/create":
+        {
+          "post":
+            {
+              "tags": ["AIBrain"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AICreateShipmentRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AICreateShipmentRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AICreateShipmentRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/ai/shipments/tracking/{trackingNumber}":
+        {
+          "get":
+            {
+              "tags": ["AIBrain"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/ai/rates/inquiry":
+        {
+          "post":
+            {
+              "tags": ["AIBrain"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIRateInquiryRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIRateInquiryRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIRateInquiryRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/ai/complaints/file":
+        {
+          "post":
+            {
+              "tags": ["AIBrain"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIFileComplaintRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIFileComplaintRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AIFileComplaintRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/ai/customers/{phoneOrEmail}":
+        {
+          "get":
+            {
+              "tags": ["AIBrain"],
+              "parameters":
+                [
+                  {
+                    "name": "phoneOrEmail",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/complaints":
+        {
+          "post":
+            {
+              "tags": ["Complaints"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateComplaintRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateComplaintRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateComplaintRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+          "get":
+            {
+              "tags": ["Complaints"],
+              "parameters":
+                [
+                  {
+                    "name": "status",
+                    "in": "query",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "type",
+                    "in": "query",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "page",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 1 },
+                  },
+                  {
+                    "name": "pageSize",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 20 },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/complaints/{complaintId}":
+        {
+          "get":
+            {
+              "tags": ["Complaints"],
+              "parameters":
+                [
+                  {
+                    "name": "complaintId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+          "patch":
+            {
+              "tags": ["Complaints"],
+              "parameters":
+                [
+                  {
+                    "name": "complaintId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateComplaintRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateComplaintRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateComplaintRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/complaints/shipment/{trackingNumber}":
+        {
+          "get":
+            {
+              "tags": ["Complaints"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/dashboard/overview":
+        {
+          "get":
+            {
+              "tags": ["Dashboard"],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/dashboard/shipments/stats":
+        {
+          "get":
+            {
+              "tags": ["Dashboard"],
+              "parameters":
+                [
+                  {
+                    "name": "period",
+                    "in": "query",
+                    "schema": { "type": "string", "default": "month" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/dashboard/revenue/stats":
+        {
+          "get":
+            {
+              "tags": ["Dashboard"],
+              "parameters":
+                [
+                  {
+                    "name": "period",
+                    "in": "query",
+                    "schema": { "type": "string", "default": "month" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/dashboard/complaints/stats":
+        {
+          "get":
+            {
+              "tags": ["Dashboard"],
+              "parameters":
+                [
+                  {
+                    "name": "period",
+                    "in": "query",
+                    "schema": { "type": "string", "default": "month" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/health":
+        {
+          "get":
+            {
+              "tags": ["Health"],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/onboarding/setup":
+        {
+          "post":
+            {
+              "tags": ["Onboarding"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/SetupTenantRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/SetupTenantRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/SetupTenantRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/OnboardingResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/OnboardingResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/OnboardingResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/onboarding/accept-invite":
+        {
+          "post":
+            {
+              "tags": ["Onboarding"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AcceptInviteRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AcceptInviteRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/AcceptInviteRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/payments":
+        {
+          "post":
+            {
+              "tags": ["Payments"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreatePaymentRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreatePaymentRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreatePaymentRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+          "get":
+            {
+              "tags": ["Payments"],
+              "parameters":
+                [
+                  {
+                    "name": "status",
+                    "in": "query",
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "page",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 1 },
+                  },
+                  {
+                    "name": "pageSize",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 20 },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/payments/{paymentId}":
+        {
+          "get":
+            {
+              "tags": ["Payments"],
+              "parameters":
+                [
+                  {
+                    "name": "paymentId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/payments/shipment/{trackingNumber}":
+        {
+          "get":
+            {
+              "tags": ["Payments"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/payments/{paymentId}/status":
+        {
+          "patch":
+            {
+              "tags": ["Payments"],
+              "parameters":
+                [
+                  {
+                    "name": "paymentId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdatePaymentStatusRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdatePaymentStatusRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdatePaymentStatusRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/rates":
+        {
+          "post":
+            {
+              "tags": ["Rates"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateRateRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateRateRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateRateRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+          "get":
+            {
+              "tags": ["Rates"],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/rates/{rateId}":
+        {
+          "get":
+            {
+              "tags": ["Rates"],
+              "parameters":
+                [
+                  {
+                    "name": "rateId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+          "patch":
+            {
+              "tags": ["Rates"],
+              "parameters":
+                [
+                  {
+                    "name": "rateId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateRateRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateRateRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateRateRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+          "delete":
+            {
+              "tags": ["Rates"],
+              "parameters":
+                [
+                  {
+                    "name": "rateId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/rates/calculate":
+        {
+          "post":
+            {
+              "tags": ["Rates"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CalculateRateRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CalculateRateRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CalculateRateRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/shipments":
+        {
+          "post":
+            {
+              "tags": ["Shipments"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateShipmentRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateShipmentRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateShipmentRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "get":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "page",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 1 },
+                  },
+                  {
+                    "name": "pageSize",
+                    "in": "query",
+                    "schema":
+                      { "type": "integer", "format": "int32", "default": 20 },
+                  },
+                  {
+                    "name": "status",
+                    "in": "query",
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponsePagedResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponsePagedResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponsePagedResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/shipments/tracking/{trackingNumber}":
+        {
+          "get":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/shipments/tracking/{trackingNumber}/status":
+        {
+          "patch":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateStatusRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateStatusRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateStatusRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ShipmentResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/shipments/{trackingNumber}/events":
+        {
+          "post":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateEventRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateEventRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateEventRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+          "get":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "trackingNumber",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/shipments/{shipmentId}/status-history":
+        {
+          "get":
+            {
+              "tags": ["Shipments"],
+              "parameters":
+                [
+                  {
+                    "name": "shipmentId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/tenants":
+        {
+          "post":
+            {
+              "tags": ["Tenants"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/tenants/{id}":
+        {
+          "get":
+            {
+              "tags": ["Tenants"],
+              "parameters":
+                [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/tenant-users":
+        {
+          "get":
+            {
+              "tags": ["TenantUsers"],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/TenantUserResponse",
+                                    },
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/TenantUserResponse",
+                                    },
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/TenantUserResponse",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["TenantUsers"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantUserRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantUserRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CreateTenantUserRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/tenant-users/invite":
+        {
+          "post":
+            {
+              "tags": ["TenantUsers"],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/InviteTenantUserRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/InviteTenantUserRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/InviteTenantUserRequest",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/TenantUserResponse",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/api/tenant-users/{tenantUserId}/role":
+        {
+          "patch":
+            {
+              "tags": ["TenantUsers"],
+              "parameters":
+                [
+                  {
+                    "name": "tenantUserId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateTenantUserRoleRequest",
+                            },
+                        },
+                      "text/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateTenantUserRoleRequest",
+                            },
+                        },
+                      "application/*+json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/UpdateTenantUserRoleRequest",
+                            },
+                        },
+                    },
+                },
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/api/tenant-users/{tenantUserId}":
+        {
+          "delete":
+            {
+              "tags": ["TenantUsers"],
+              "parameters":
+                [
+                  {
+                    "name": "tenantUserId",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses": { "200": { "description": "OK" } },
+            },
+        },
+      "/WeatherForecast":
+        {
+          "get":
+            {
+              "tags": ["WeatherForecast"],
+              "operationId": "GetWeatherForecast",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "OK",
+                      "content":
+                        {
+                          "text/plain":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/WeatherForecast",
+                                    },
+                                },
+                            },
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/WeatherForecast",
+                                    },
+                                },
+                            },
+                          "text/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/WeatherForecast",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+  "components":
+    {
+      "schemas":
+        {
+          "AICreateShipmentRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "sender": { "$ref": "#/components/schemas/ContactInfo" },
+                  "receiver": { "$ref": "#/components/schemas/ContactInfo" },
+                  "parcel": { "$ref": "#/components/schemas/ParcelInfo" },
+                  "serviceType": { "type": "string", "nullable": true },
+                  "conversationId": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "AIFileComplaintRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "trackingNumber": { "type": "string", "nullable": true },
+                  "description": { "type": "string", "nullable": true },
+                  "type": { "type": "string", "nullable": true },
+                  "customerContact": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "AIRateInquiryRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "weight": { "type": "number", "format": "double" },
+                  "serviceType": { "type": "string", "nullable": true },
+                  "origin": { "type": "string", "nullable": true },
+                  "destination": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "AcceptInviteRequest":
+            {
+              "type": "object",
+              "properties":
+                { "invitationToken": { "type": "string", "nullable": true } },
+              "additionalProperties": false,
+            },
+          "CalculateRateRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "weight": { "type": "number", "format": "double" },
+                  "length":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "width":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "height":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "serviceType": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "ContactInfo":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "name": { "type": "string", "nullable": true },
+                  "address": { "type": "string", "nullable": true },
+                  "city": { "type": "string", "nullable": true },
+                  "country": { "type": "string", "nullable": true },
+                  "phone": { "type": "string", "nullable": true },
+                  "email": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreateComplaintRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "trackingNumber": { "type": "string", "nullable": true },
+                  "type": { "type": "string", "nullable": true },
+                  "description": { "type": "string", "nullable": true },
+                  "customerEmail": { "type": "string", "nullable": true },
+                  "customerPhone": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreateEventRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "status": { "type": "string", "nullable": true },
+                  "location": { "type": "string", "nullable": true },
+                  "notes": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreatePaymentRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "trackingNumber": { "type": "string", "nullable": true },
+                  "amount": { "type": "number", "format": "double" },
+                  "method": { "type": "string", "nullable": true },
+                  "transactionId": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreateRateRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "serviceType": { "type": "string", "nullable": true },
+                  "baseRate": { "type": "number", "format": "double" },
+                  "additionalKgRate": { "type": "number", "format": "double" },
+                  "minWeight": { "type": "number", "format": "double" },
+                  "maxWeight": { "type": "number", "format": "double" },
+                },
+              "additionalProperties": false,
+            },
+          "CreateShipmentRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "sender": { "$ref": "#/components/schemas/ContactInfo" },
+                  "receiver": { "$ref": "#/components/schemas/ContactInfo" },
+                  "parcel": { "$ref": "#/components/schemas/ParcelInfo" },
+                  "serviceType": { "type": "string", "nullable": true },
+                  "specialInstructions": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreateTenantRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "name": { "type": "string", "nullable": true },
+                  "plan": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "CreateTenantUserRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "email": { "type": "string", "nullable": true },
+                  "role": { "type": "string", "nullable": true },
+                  "name": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "InviteTenantUserRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "email": { "type": "string", "nullable": true },
+                  "role": { "type": "string", "nullable": true },
+                  "message": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "OnboardingResponse":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "tenantId": { "type": "string", "nullable": true },
+                  "tenantName": { "type": "string", "nullable": true },
+                  "apiKey": { "type": "string", "nullable": true },
+                  "plan": { "type": "string", "nullable": true },
+                  "role": { "type": "string", "nullable": true },
+                  "message": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "PaginationMeta":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "page": { "type": "integer", "format": "int32" },
+                  "pageSize": { "type": "integer", "format": "int32" },
+                  "totalPages": { "type": "integer", "format": "int64" },
+                  "totalItems": { "type": "integer", "format": "int64" },
+                },
+              "additionalProperties": false,
+            },
+          "ParcelInfo":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "weight": { "type": "number", "format": "double" },
+                  "length":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "width":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "height":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "description": { "type": "string", "nullable": true },
+                  "value":
+                    { "type": "number", "format": "double", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "SetupTenantRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "companyName": { "type": "string", "nullable": true },
+                  "plan": { "type": "string", "nullable": true },
+                  "enabledServices":
+                    {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "nullable": true,
+                    },
+                  "branding":
+                    { "$ref": "#/components/schemas/TenantBrandingRequest" },
+                },
+              "additionalProperties": false,
+            },
+          "ShipmentResponse":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "nullable": true },
+                  "trackingNumber": { "type": "string", "nullable": true },
+                  "sender": { "$ref": "#/components/schemas/ContactInfo" },
+                  "receiver": { "$ref": "#/components/schemas/ContactInfo" },
+                  "parcel": { "$ref": "#/components/schemas/ParcelInfo" },
+                  "serviceType": { "type": "string", "nullable": true },
+                  "status": { "type": "string", "nullable": true },
+                  "estimatedDelivery":
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true,
+                    },
+                  "createdAt": { "type": "string", "format": "date-time" },
+                },
+              "additionalProperties": false,
+            },
+          "ShipmentResponsePagedResponse":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "data":
+                    {
+                      "type": "array",
+                      "items":
+                        { "$ref": "#/components/schemas/ShipmentResponse" },
+                      "nullable": true,
+                    },
+                  "pagination":
+                    { "$ref": "#/components/schemas/PaginationMeta" },
+                },
+              "additionalProperties": false,
+            },
+          "TenantBrandingRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "primaryColor": { "type": "string", "nullable": true },
+                  "tone": { "type": "string", "nullable": true },
+                  "logoUrl": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "TenantResponse":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "nullable": true },
+                  "name": { "type": "string", "nullable": true },
+                  "apiKey": { "type": "string", "nullable": true },
+                  "plan": { "type": "string", "nullable": true },
+                  "createdAt": { "type": "string", "format": "date-time" },
+                },
+              "additionalProperties": false,
+            },
+          "TenantUserResponse":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "id": { "type": "string", "nullable": true },
+                  "clerkUserId": { "type": "string", "nullable": true },
+                  "tenantId": { "type": "string", "nullable": true },
+                  "email": { "type": "string", "nullable": true },
+                  "name": { "type": "string", "nullable": true },
+                  "role": { "type": "string", "nullable": true },
+                  "status": { "type": "string", "nullable": true },
+                  "invitedAt":
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true,
+                    },
+                  "invitedBy": { "type": "string", "nullable": true },
+                  "createdAt": { "type": "string", "format": "date-time" },
+                },
+              "additionalProperties": false,
+            },
+          "UpdateComplaintRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "status": { "type": "string", "nullable": true },
+                  "resolution": { "type": "string", "nullable": true },
+                  "assignedTo": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "UpdatePaymentStatusRequest":
+            {
+              "type": "object",
+              "properties":
+                { "status": { "type": "string", "nullable": true } },
+              "additionalProperties": false,
+            },
+          "UpdateRateRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "baseRate":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "additionalKgRate":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "minWeight":
+                    { "type": "number", "format": "double", "nullable": true },
+                  "maxWeight":
+                    { "type": "number", "format": "double", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "UpdateStatusRequest":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "status": { "type": "string", "nullable": true },
+                  "location": { "type": "string", "nullable": true },
+                  "notes": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+          "UpdateTenantUserRoleRequest":
+            {
+              "type": "object",
+              "properties": { "role": { "type": "string", "nullable": true } },
+              "additionalProperties": false,
+            },
+          "WeatherForecast":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "date": { "type": "string", "format": "date" },
+                  "temperatureC": { "type": "integer", "format": "int32" },
+                  "temperatureF":
+                    { "type": "integer", "format": "int32", "readOnly": true },
+                  "summary": { "type": "string", "nullable": true },
+                },
+              "additionalProperties": false,
+            },
+        },
+    },
+  "tags":
+    [
+      { "name": "AIBrain" },
+      { "name": "Complaints" },
+      { "name": "Dashboard" },
+      { "name": "Health" },
+      { "name": "Onboarding" },
+      { "name": "Payments" },
+      { "name": "Rates" },
+      { "name": "Shipments" },
+      { "name": "Tenants" },
+      { "name": "TenantUsers" },
+      { "name": "WeatherForecast" },
+    ],
+}
