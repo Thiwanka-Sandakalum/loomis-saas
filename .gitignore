@@ -1,0 +1,5 @@
+**/.vscode/
+**/node_modules/
+**/dist/
+core-service/src/CoreCourierService.Api/appsettings.json
+**/*.env
