@@ -37,6 +37,13 @@ jobs:
         run: npx ng build --base-href /loomis-saas/
         working-directory: ./admin-dashboard
 
+      - name: Ensure index.html exists
+        run: |
+          if [ ! -f ./admin-dashboard/dist/loomis-app/browser/index.html ]; then
+            echo "index.html not found! Build may have failed or output path is incorrect."
+            exit 1
+          fi
+
       - name: Copy index.html to 404.html
         run: cp ./admin-dashboard/dist/loomis-app/browser/index.html ./admin-dashboard/dist/loomis-app/browser/404.html
 
