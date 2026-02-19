@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "web": "npx tsc && adk web dist/agent.js",
     "run": "npx tsc && adk run dist/agent.js",
-    "api": "npx tsc && npx adk api_server --allow_origins \"*\" dist/agent.js"
+    "api": "npx tsc && npx adk api_server --allow_origins \"*\" dist/agent.js",
+    "start": "npx tsc && npx adk api_server --allow_origins \"*\" dist/agent.js",
+    "build": "npx tsc"
   },
   "keywords": [],
   "author": "",
