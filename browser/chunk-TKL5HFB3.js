@@ -1,0 +1,1 @@
+import{b as n,c as o}from"./chunk-GF7BQK6Q.js";import{$ as i}from"./chunk-JKZ4R3JY.js";import{a as e}from"./chunk-2NFLSA4Y.js";function s(r){return i([typeof r=="string"?{provide:n,useValue:r}:{provide:o,useValue:new o(e({},r))}])}export{s as a};

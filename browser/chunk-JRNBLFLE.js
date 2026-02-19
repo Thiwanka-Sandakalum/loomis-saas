@@ -1,0 +1,1 @@
+import"./chunk-2NFLSA4Y.js";var o=[{path:"",loadComponent:()=>import("./chunk-BQACF2ST.js")},{path:"create",loadComponent:()=>import("./chunk-ZIVUNJNH.js").then(t=>t.ShipmentCreateComponent)},{path:":trackingNumber",loadComponent:()=>import("./chunk-FMI6OYUZ.js")}];export{o as default};

@@ -1,0 +1,1 @@
+import"./chunk-2NFLSA4Y.js";var t=[{path:"company-setup",loadComponent:()=>import("./chunk-WIL2HEUP.js").then(o=>o.CompanySetupComponent)},{path:"service-rates",loadComponent:()=>import("./chunk-GIHG4TSQ.js").then(o=>o.ServiceRatesComponent)}];export{t as default};
