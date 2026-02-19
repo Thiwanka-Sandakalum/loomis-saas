@@ -1,8 +1,8 @@
 export const environment = {
-    production: false,
-    apiUrl: 'http://localhost:5246',
-    wsUrl: 'ws://localhost:5246',
-    brainApiUrl: 'http://localhost:8000', // Use proxy to avoid CORS issues
+    production: true,
+    apiUrl: 'https://lomis-main-core-905498284628.europe-west1.run.app',
+    wsUrl: 'wss://lomis-main-core-905498284628.europe-west1.run.app',
+    brainApiUrl: 'https://lomis-main-brain-905498284628.europe-west1.run.app', // Use proxy to avoid CORS issues
     apiKey: 'cmp_live_680fm01pjn8lcyk2wjkfsk4u39qie79q', // Default tenant API key for sandbox
     auth0: {
         audience: 'https://loomis-main-srv/',
