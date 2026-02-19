@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CoreCourierService.Api/CoreCourierService.Api.csproj" />
+    <Project Path="src/CoreCourierService.Core/CoreCourierService.Core.csproj" />
+    <Project Path="src/CoreCourierService.Infrastructure/CoreCourierService.Infrastructure.csproj" />
+  </Folder>
+</Solution>
