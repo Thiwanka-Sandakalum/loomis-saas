@@ -43,7 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./admin-dashboard/dist/admin-dashboard
+          path: ./admin-dashboard/dist/loomis-app
 
       - name: Deploy to GitHub Pages
         id: deployment
