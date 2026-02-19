@@ -34,8 +34,11 @@ jobs:
         working-directory: ./admin-dashboard
 
       - name: Build Angular app
-        run: npx ng build --base-href /REPO_NAME/
+        run: npx ng build --base-href /loomis-saas/
         working-directory: ./admin-dashboard
+
+      - name: Copy index.html to 404.html
+        run: cp ./admin-dashboard/dist/loomis-app/browser/index.html ./admin-dashboard/dist/loomis-app/browser/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -43,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./admin-dashboard/dist/loomis-app
+          path: ./admin-dashboard/dist/loomis-app/browser
 
       - name: Deploy to GitHub Pages
         id: deployment
