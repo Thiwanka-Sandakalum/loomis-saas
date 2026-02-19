@@ -1,0 +1,4745 @@
+openapi: 3.0.4
+info:
+  title: CoreCourierService.Api
+  version: "1.0"
+paths:
+  /api/ai/shipments/create:
+    post:
+      tags:
+        - AIBrain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AICreateShipmentRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AICreateShipmentRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AICreateShipmentRequest'
+      responses:
+        "200":
+          description: OK
+  /api/ai/shipments/tracking/{trackingNumber}:
+    get:
+      tags:
+        - AIBrain
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/ai/rates/inquiry:
+    post:
+      tags:
+        - AIBrain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIRateInquiryRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AIRateInquiryRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AIRateInquiryRequest'
+      responses:
+        "200":
+          description: OK
+  /api/ai/complaints/file:
+    post:
+      tags:
+        - AIBrain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIFileComplaintRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AIFileComplaintRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AIFileComplaintRequest'
+      responses:
+        "200":
+          description: OK
+  /api/ai/customers/{phoneOrEmail}:
+    get:
+      tags:
+        - AIBrain
+      parameters:
+        - name: phoneOrEmail
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/complaints:
+    post:
+      tags:
+        - Complaints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComplaintRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateComplaintRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateComplaintRequest'
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - Complaints
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: OK
+  /api/complaints/{complaintId}:
+    get:
+      tags:
+        - Complaints
+      parameters:
+        - name: complaintId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+        - Complaints
+      parameters:
+        - name: complaintId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComplaintRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComplaintRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateComplaintRequest'
+      responses:
+        "200":
+          description: OK
+  /api/complaints/shipment/{trackingNumber}:
+    get:
+      tags:
+        - Complaints
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/auth/public:
+    get:
+      tags:
+        - CoreCourierService.Api
+      operationId: GetPublic
+      responses:
+        "200":
+          description: OK
+  /api/auth/private:
+    get:
+      tags:
+        - CoreCourierService.Api
+      operationId: GetPrivate
+      responses:
+        "200":
+          description: OK
+  /api/dashboard/overview:
+    get:
+      tags:
+        - Dashboard
+      responses:
+        "200":
+          description: OK
+  /api/dashboard/shipments/stats:
+    get:
+      tags:
+        - Dashboard
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            default: month
+      responses:
+        "200":
+          description: OK
+  /api/dashboard/revenue/stats:
+    get:
+      tags:
+        - Dashboard
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            default: month
+      responses:
+        "200":
+          description: OK
+  /api/dashboard/complaints/stats:
+    get:
+      tags:
+        - Dashboard
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            default: month
+      responses:
+        "200":
+          description: OK
+  /api/health:
+    get:
+      tags:
+        - Health
+      responses:
+        "200":
+          description: OK
+  /api/integrations/telegram/setup:
+    post:
+      tags:
+        - Integrations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupTelegramRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SetupTelegramRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SetupTelegramRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TelegramIntegrationResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramIntegrationResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TelegramIntegrationResponse'
+  /api/integrations/telegram/disconnect:
+    delete:
+      tags:
+        - Integrations
+      responses:
+        "200":
+          description: OK
+  /api/integrations/telegram/status:
+    get:
+      tags:
+        - Integrations
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TelegramStatusResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramStatusResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TelegramStatusResponse'
+  /api/integrations/telegram/webhook-info:
+    get:
+      tags:
+        - Integrations
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TelegramWebhookInfo'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramWebhookInfo'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TelegramWebhookInfo'
+  /api/integrations/telegram/test-connection:
+    post:
+      tags:
+        - Integrations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestConnectionRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TestConnectionRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TestConnectionRequest'
+      responses:
+        "200":
+          description: OK
+  /api/integrations/telegram/webhook/{tenantId}:
+    post:
+      tags:
+        - Integrations
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+      responses:
+        "200":
+          description: OK
+  /api/onboarding/setup:
+    post:
+      tags:
+        - Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupTenantRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SetupTenantRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SetupTenantRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/OnboardingResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingResponse'
+  /api/onboarding/accept-invite:
+    post:
+      tags:
+        - Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequest'
+      responses:
+        "200":
+          description: OK
+  /api/onboarding/company-profile:
+    put:
+      tags:
+        - Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyProfileRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CompanyProfileRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CompanyProfileRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+  /api/onboarding/rates:
+    post:
+      tags:
+        - Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingRatesRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingRatesRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/OnboardingRatesRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+  /api/onboarding/status:
+    get:
+      tags:
+        - Onboarding
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStatusResponse'
+  /api/payments:
+    post:
+      tags:
+        - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - Payments
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: OK
+  /api/payments/{paymentId}:
+    get:
+      tags:
+        - Payments
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/payments/shipment/{trackingNumber}:
+    get:
+      tags:
+        - Payments
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/payments/{paymentId}/status:
+    patch:
+      tags:
+        - Payments
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentStatusRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentStatusRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentStatusRequest'
+      responses:
+        "200":
+          description: OK
+  /api/rates:
+    post:
+      tags:
+        - Rates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRateRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateRateRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateRateRequest'
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - Rates
+      responses:
+        "200":
+          description: OK
+  /api/rates/{rateId}:
+    get:
+      tags:
+        - Rates
+      parameters:
+        - name: rateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+        - Rates
+      parameters:
+        - name: rateId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRateRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRateRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateRateRequest'
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+        - Rates
+      parameters:
+        - name: rateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/rates/calculate:
+    post:
+      tags:
+        - Rates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateRateRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CalculateRateRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CalculateRateRequest'
+      responses:
+        "200":
+          description: OK
+  /api/sessions:
+    post:
+      tags:
+        - Sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+    get:
+      tags:
+        - Sessions
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+  /api/sessions/{sessionId}:
+    get:
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+    put:
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionDataRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionDataRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionDataRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+    delete:
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/sessions/user/{userId}:
+    get:
+      tags:
+        - Sessions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+    delete:
+      tags:
+        - Sessions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/sessions/{sessionId}/extend:
+    post:
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: hours
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 24
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+  /api/sessions/cleanup:
+    post:
+      tags:
+        - Sessions
+      responses:
+        "200":
+          description: OK
+  /api/shipments:
+    post:
+      tags:
+        - Shipments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+    get:
+      tags:
+        - Shipments
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponsePagedResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponsePagedResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponsePagedResponse'
+  /api/shipments/tracking/{trackingNumber}:
+    get:
+      tags:
+        - Shipments
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+  /api/shipments/tracking/{trackingNumber}/status:
+    patch:
+      tags:
+        - Shipments
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+  /api/shipments/{trackingNumber}/events:
+    post:
+      tags:
+        - Shipments
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - Shipments
+      parameters:
+        - name: trackingNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/shipments/{shipmentId}/status-history:
+    get:
+      tags:
+        - Shipments
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/telegram/chats:
+    get:
+      tags:
+        - Telegram
+      parameters:
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 50
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TelegramChatListResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramChatListResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TelegramChatListResponse'
+  /api/telegram/chats/{chatId}/messages:
+    get:
+      tags:
+        - Telegram
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TelegramMessageListResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramMessageListResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TelegramMessageListResponse'
+  /api/telegram/webhook:
+    post:
+      tags:
+        - Telegram
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TelegramUpdate'
+      responses:
+        "200":
+          description: OK
+  /api/telegram/send:
+    post:
+      tags:
+        - Telegram
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendTelegramMessageRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SendTelegramMessageRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SendTelegramMessageRequest'
+      responses:
+        "200":
+          description: OK
+  /api/tenants:
+    post:
+      tags:
+        - Tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+  /api/tenants/{id}:
+    get:
+      tags:
+        - Tenants
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+  /api/tenant-users:
+    get:
+      tags:
+        - TenantUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantUserResponse'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantUserResponse'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantUserResponse'
+    post:
+      tags:
+        - TenantUsers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantUserRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantUserRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantUserRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+  /api/tenant-users/invite:
+    post:
+      tags:
+        - TenantUsers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteTenantUserRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/InviteTenantUserRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/InviteTenantUserRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TenantUserResponse'
+  /api/tenant-users/{tenantUserId}/role:
+    patch:
+      tags:
+        - TenantUsers
+      parameters:
+        - name: tenantUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantUserRoleRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantUserRoleRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantUserRoleRequest'
+      responses:
+        "200":
+          description: OK
+  /api/tenant-users/{tenantUserId}:
+    delete:
+      tags:
+        - TenantUsers
+      parameters:
+        - name: tenantUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /WeatherForecast:
+    get:
+      tags:
+        - WeatherForecast
+      operationId: GetWeatherForecast
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherForecast'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherForecast'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherForecast'
+components:
+  schemas:
+    AICreateShipmentRequest:
+      type: object
+      properties:
+        sender:
+          $ref: '#/components/schemas/ContactInfo'
+        receiver:
+          $ref: '#/components/schemas/ContactInfo'
+        parcel:
+          $ref: '#/components/schemas/ParcelInfo'
+        serviceType:
+          type: string
+          nullable: true
+        conversationId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    AIFileComplaintRequest:
+      type: object
+      properties:
+        trackingNumber:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        customerContact:
+          type: string
+          nullable: true
+      additionalProperties: false
+    AIRateInquiryRequest:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: double
+        serviceType:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+      additionalProperties: false
+    AcceptInviteRequest:
+      type: object
+      properties:
+        invitationToken:
+          type: string
+          nullable: true
+      additionalProperties: false
+    BsonBinaryData:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        bytes:
+          type: string
+          format: byte
+          nullable: true
+        subType:
+          $ref: '#/components/schemas/BsonBinarySubType'
+      additionalProperties: false
+    BsonBinarySubType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 128
+      type: integer
+      format: int32
+    BsonDateTime:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        millisecondsSinceEpoch:
+          type: integer
+          format: int64
+          readOnly: true
+      additionalProperties: false
+    BsonElement:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        value:
+          $ref: '#/components/schemas/BsonValue'
+      additionalProperties: false
+    BsonJavaScript:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        code:
+          type: string
+          nullable: true
+      additionalProperties: false
+    BsonJavaScriptWithScope:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        code:
+          type: string
+          nullable: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        scope:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+      additionalProperties: false
+    BsonMaxKey:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+      additionalProperties: false
+    BsonMinKey:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+      additionalProperties: false
+    BsonNull:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+      additionalProperties: false
+    BsonRegularExpression:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        pattern:
+          type: string
+          nullable: true
+        options:
+          type: string
+          nullable: true
+          readOnly: true
+      additionalProperties: false
+    BsonSymbol:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        name:
+          type: string
+          nullable: true
+          readOnly: true
+      additionalProperties: false
+    BsonTimestamp:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        value:
+          type: integer
+          format: int64
+        increment:
+          type: integer
+          format: int32
+          readOnly: true
+        timestamp:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    BsonType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - 11
+        - 13
+        - 14
+        - 15
+        - 16
+        - 17
+        - 18
+        - 19
+        - 127
+        - 255
+      type: integer
+      format: int32
+    BsonUndefined:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+      additionalProperties: false
+    BsonValue:
+      type: object
+      properties:
+        asBoolean:
+          type: boolean
+          readOnly: true
+        asBsonArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonValue'
+          nullable: true
+          readOnly: true
+        asBsonBinaryData:
+          $ref: '#/components/schemas/BsonBinaryData'
+        asBsonDateTime:
+          $ref: '#/components/schemas/BsonDateTime'
+        asBsonDocument:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+          readOnly: true
+        asBsonJavaScript:
+          $ref: '#/components/schemas/BsonJavaScript'
+        asBsonJavaScriptWithScope:
+          $ref: '#/components/schemas/BsonJavaScriptWithScope'
+        asBsonMaxKey:
+          $ref: '#/components/schemas/BsonMaxKey'
+        asBsonMinKey:
+          $ref: '#/components/schemas/BsonMinKey'
+        asBsonNull:
+          $ref: '#/components/schemas/BsonNull'
+        asBsonRegularExpression:
+          $ref: '#/components/schemas/BsonRegularExpression'
+        asBsonSymbol:
+          $ref: '#/components/schemas/BsonSymbol'
+        asBsonTimestamp:
+          $ref: '#/components/schemas/BsonTimestamp'
+        asBsonUndefined:
+          $ref: '#/components/schemas/BsonUndefined'
+        asBsonValue:
+          $ref: '#/components/schemas/BsonValue'
+        asByteArray:
+          type: string
+          format: byte
+          nullable: true
+          readOnly: true
+        asDecimal:
+          type: number
+          format: double
+          readOnly: true
+        asDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asDouble:
+          type: number
+          format: double
+          readOnly: true
+        asGuid:
+          type: string
+          format: uuid
+          readOnly: true
+        asInt32:
+          type: integer
+          format: int32
+          readOnly: true
+        asInt64:
+          type: integer
+          format: int64
+          readOnly: true
+        asLocalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        asNullableBoolean:
+          type: boolean
+          nullable: true
+          readOnly: true
+        asNullableDecimal:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableDecimal128:
+          $ref: '#/components/schemas/Decimal128'
+        asNullableDouble:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+        asNullableGuid:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        asNullableInt32:
+          type: integer
+          format: int32
+          nullable: true
+          readOnly: true
+        asNullableInt64:
+          type: integer
+          format: int64
+          nullable: true
+          readOnly: true
+        asNullableLocalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asNullableObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asNullableUniversalTime:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        asObjectId:
+          $ref: '#/components/schemas/ObjectId'
+        asRegex:
+          $ref: '#/components/schemas/Regex'
+        asString:
+          type: string
+          nullable: true
+          readOnly: true
+        asUniversalTime:
+          type: string
+          format: date-time
+          readOnly: true
+        bsonType:
+          $ref: '#/components/schemas/BsonType'
+        isBoolean:
+          type: boolean
+          readOnly: true
+        isBsonArray:
+          type: boolean
+          readOnly: true
+        isBsonBinaryData:
+          type: boolean
+          readOnly: true
+        isBsonDateTime:
+          type: boolean
+          readOnly: true
+        isBsonDocument:
+          type: boolean
+          readOnly: true
+        isBsonJavaScript:
+          type: boolean
+          readOnly: true
+        isBsonJavaScriptWithScope:
+          type: boolean
+          readOnly: true
+        isBsonMaxKey:
+          type: boolean
+          readOnly: true
+        isBsonMinKey:
+          type: boolean
+          readOnly: true
+        isBsonNull:
+          type: boolean
+          readOnly: true
+        isBsonRegularExpression:
+          type: boolean
+          readOnly: true
+        isBsonSymbol:
+          type: boolean
+          readOnly: true
+        isBsonTimestamp:
+          type: boolean
+          readOnly: true
+        isBsonUndefined:
+          type: boolean
+          readOnly: true
+        isDecimal128:
+          type: boolean
+          readOnly: true
+        isDouble:
+          type: boolean
+          readOnly: true
+        isGuid:
+          type: boolean
+          readOnly: true
+        isInt32:
+          type: boolean
+          readOnly: true
+        isInt64:
+          type: boolean
+          readOnly: true
+        isNumeric:
+          type: boolean
+          readOnly: true
+        isObjectId:
+          type: boolean
+          readOnly: true
+        isString:
+          type: boolean
+          readOnly: true
+        isValidDateTime:
+          type: boolean
+          readOnly: true
+      additionalProperties: false
+    CalculateRateRequest:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: double
+        length:
+          type: number
+          format: double
+          nullable: true
+        width:
+          type: number
+          format: double
+          nullable: true
+        height:
+          type: number
+          format: double
+          nullable: true
+        serviceType:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CompanyProfileRequest:
+      type: object
+      properties:
+        organizationName:
+          type: string
+          nullable: true
+        corporateWebsite:
+          type: string
+          nullable: true
+        primaryLanguage:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        supportEmail:
+          type: string
+          nullable: true
+        supportPhone:
+          type: string
+          nullable: true
+        headquartersAddress:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ContactInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateComplaintRequest:
+      type: object
+      properties:
+        trackingNumber:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          nullable: true
+        customerPhone:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateEventRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreatePaymentRequest:
+      type: object
+      properties:
+        trackingNumber:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          format: double
+        method:
+          type: string
+          nullable: true
+        transactionId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateRateRequest:
+      type: object
+      properties:
+        serviceType:
+          type: string
+          nullable: true
+        baseRate:
+          type: number
+          format: double
+        additionalKgRate:
+          type: number
+          format: double
+        minWeight:
+          type: number
+          format: double
+        maxWeight:
+          type: number
+          format: double
+      additionalProperties: false
+    CreateSessionRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          nullable: true
+        channel:
+          type: string
+          nullable: true
+        expiryHours:
+          type: integer
+          format: int32
+      additionalProperties: false
+    CreateShipmentRequest:
+      type: object
+      properties:
+        sender:
+          $ref: '#/components/schemas/ContactInfo'
+        receiver:
+          $ref: '#/components/schemas/ContactInfo'
+        parcel:
+          $ref: '#/components/schemas/ParcelInfo'
+        serviceType:
+          type: string
+          nullable: true
+        specialInstructions:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateTenantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateTenantUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        role:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Decimal128:
+      type: object
+      additionalProperties: false
+    InviteTenantUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        role:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ObjectId:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          format: int32
+          readOnly: true
+        creationTime:
+          type: string
+          format: date-time
+          readOnly: true
+      additionalProperties: false
+    OnboardingRatesRequest:
+      type: object
+      properties:
+        rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateRateRequest'
+          nullable: true
+      additionalProperties: false
+    OnboardingResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          nullable: true
+        tenantName:
+          type: string
+          nullable: true
+        apiKey:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+        role:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        onboarding:
+          $ref: '#/components/schemas/OnboardingStatus'
+      additionalProperties: false
+    OnboardingStatus:
+      type: object
+      properties:
+        profileCompleted:
+          type: boolean
+        ratesCompleted:
+          type: boolean
+        status:
+          type: string
+          nullable: true
+      additionalProperties: false
+    OnboardingStatusResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          nullable: true
+        profileCompleted:
+          type: boolean
+        ratesCompleted:
+          type: boolean
+        status:
+          type: string
+          nullable: true
+      additionalProperties: false
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int64
+        totalItems:
+          type: integer
+          format: int64
+      additionalProperties: false
+    ParcelInfo:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: double
+        length:
+          type: number
+          format: double
+          nullable: true
+        width:
+          type: number
+          format: double
+          nullable: true
+        height:
+          type: number
+          format: double
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        value:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    Regex:
+      type: object
+      properties:
+        options:
+          $ref: '#/components/schemas/RegexOptions'
+        rightToLeft:
+          type: boolean
+          readOnly: true
+        matchTimeout:
+          type: string
+          format: date-span
+          readOnly: true
+      additionalProperties: false
+    RegexOptions:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 4
+        - 8
+        - 16
+        - 32
+        - 64
+        - 256
+        - 512
+        - 1024
+      type: integer
+      format: int32
+    SendTelegramMessageRequest:
+      type: object
+      properties:
+        chatId:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SessionListResponse:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionResponse'
+          nullable: true
+        total:
+          type: integer
+          format: int32
+      additionalProperties: false
+    SessionResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          nullable: true
+        userId:
+          type: string
+          nullable: true
+        channel:
+          type: string
+          nullable: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+      additionalProperties: false
+    SetupTelegramRequest:
+      type: object
+      properties:
+        botToken:
+          type: string
+          nullable: true
+        botUsername:
+          type: string
+          nullable: true
+        allowedCommands:
+          type: array
+          items:
+            type: string
+          nullable: true
+        autoReplyEnabled:
+          type: boolean
+        forwardToBrain:
+          type: boolean
+        greetingMessage:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SetupTenantRequest:
+      type: object
+      properties:
+        companyName:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+        enabledServices:
+          type: array
+          items:
+            type: string
+          nullable: true
+        branding:
+          $ref: '#/components/schemas/TenantBrandingRequest'
+      additionalProperties: false
+    ShipmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        sender:
+          $ref: '#/components/schemas/ContactInfo'
+        receiver:
+          $ref: '#/components/schemas/ContactInfo'
+        parcel:
+          $ref: '#/components/schemas/ParcelInfo'
+        serviceType:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        estimatedDelivery:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    ShipmentResponsePagedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentResponse'
+          nullable: true
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      additionalProperties: false
+    TelegramCallbackQuery:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        from:
+          $ref: '#/components/schemas/TelegramUser'
+        message:
+          $ref: '#/components/schemas/TelegramMessage'
+        data:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramChat:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramChatListResponse:
+      type: object
+      properties:
+        chats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelegramChatResponse'
+          nullable: true
+        total:
+          type: integer
+          format: int32
+        skip:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      additionalProperties: false
+    TelegramChatResponse:
+      type: object
+      properties:
+        chatId:
+          type: string
+          nullable: true
+        userName:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        lastMessageAt:
+          type: string
+          format: date-time
+          nullable: true
+        messageCount:
+          type: integer
+          format: int32
+      additionalProperties: false
+    TelegramConfigDto:
+      type: object
+      properties:
+        botUsername:
+          type: string
+          nullable: true
+        webhookUrl:
+          type: string
+          nullable: true
+        allowedCommands:
+          type: array
+          items:
+            type: string
+          nullable: true
+        autoReplyEnabled:
+          type: boolean
+        forwardToBrain:
+          type: boolean
+        greetingMessage:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramIntegrationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        integrationType:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        config:
+          $ref: '#/components/schemas/TelegramConfigDto'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    TelegramMessage:
+      type: object
+      properties:
+        messageId:
+          type: integer
+          format: int64
+        from:
+          $ref: '#/components/schemas/TelegramUser'
+        chat:
+          $ref: '#/components/schemas/TelegramChat'
+        text:
+          type: string
+          nullable: true
+        date:
+          type: integer
+          format: int64
+      additionalProperties: false
+    TelegramMessageListResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelegramMessageResponse'
+          nullable: true
+        total:
+          type: integer
+          format: int32
+        skip:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      additionalProperties: false
+    TelegramMessageResponse:
+      type: object
+      properties:
+        messageId:
+          type: string
+          nullable: true
+        chatId:
+          type: string
+          nullable: true
+        fromUser:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+        direction:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        sessionId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramStatusResponse:
+      type: object
+      properties:
+        isConnected:
+          type: boolean
+        botUsername:
+          type: string
+          nullable: true
+        autoReplyEnabled:
+          type: boolean
+        forwardToBrain:
+          type: boolean
+      additionalProperties: false
+    TelegramUpdate:
+      type: object
+      properties:
+        updateId:
+          type: integer
+          format: int64
+        message:
+          $ref: '#/components/schemas/TelegramMessage'
+        callbackQuery:
+          $ref: '#/components/schemas/TelegramCallbackQuery'
+      additionalProperties: false
+    TelegramUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        isBot:
+          type: boolean
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        languageCode:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramWebhookInfo:
+      type: object
+      properties:
+        url:
+          type: string
+          nullable: true
+        hasCustomCertificate:
+          type: boolean
+        pendingUpdateCount:
+          type: integer
+          format: int32
+        lastErrorMessage:
+          type: string
+          nullable: true
+        lastErrorDate:
+          type: integer
+          format: int64
+          nullable: true
+      additionalProperties: false
+    TenantBrandingRequest:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+          nullable: true
+        tone:
+          type: string
+          nullable: true
+        logoUrl:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TenantResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        apiKey:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    TenantUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        auth0UserId:
+          type: string
+          nullable: true
+        tenantId:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        invitedAt:
+          type: string
+          format: date-time
+          nullable: true
+        invitedBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    TestConnectionRequest:
+      type: object
+      properties:
+        botToken:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdateComplaintRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+        resolution:
+          type: string
+          nullable: true
+        assignedTo:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdatePaymentStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdateRateRequest:
+      type: object
+      properties:
+        baseRate:
+          type: number
+          format: double
+          nullable: true
+        additionalKgRate:
+          type: number
+          format: double
+          nullable: true
+        minWeight:
+          type: number
+          format: double
+          nullable: true
+        maxWeight:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    UpdateSessionDataRequest:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BsonElement'
+          nullable: true
+      additionalProperties: false
+    UpdateStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdateTenantUserRoleRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          nullable: true
+      additionalProperties: false
+    WeatherForecast:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        temperatureC:
+          type: integer
+          format: int32
+        temperatureF:
+          type: integer
+          format: int32
+          readOnly: true
+        summary:
+          type: string
+          nullable: true
+      additionalProperties: false
+tags:
+  - name: AIBrain
+  - name: Complaints
+  - name: CoreCourierService.Api
+  - name: Dashboard
+  - name: Health
+  - name: Integrations
+  - name: Onboarding
+  - name: Payments
+  - name: Rates
+  - name: Sessions
+  - name: Shipments
+  - name: Telegram
+  - name: Tenants
+  - name: TenantUsers
+  - name: WeatherForecast
