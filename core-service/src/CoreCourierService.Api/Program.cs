@@ -117,4 +117,8 @@ app.UseMvc(routes =>
         template: "{controller=Home}/{action=Index}/{id?}");
 });
 
+
+// Listen on the port defined by the PORT environment variable (Cloud Run requirement)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
 app.Run();
