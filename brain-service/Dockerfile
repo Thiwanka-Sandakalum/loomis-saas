@@ -33,13 +33,6 @@ COPY --from=builder /app/openapi.yaml ./
 RUN addgroup -g 1001 appgroup && adduser -D -u 1001 -G appgroup appuser
 USER appuser
 
-# Expose correct port for Cloud Run (default 3000, can override with env)
-ENV PORT=3000
-EXPOSE 3000
-
-# Healthcheck (Cloud Run expects /, but we provide /api/health)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-	CMD wget --spider -q http://localhost:3000/api/health || exit 1
 
 # Start API server (Cloud Run sets $PORT)
 CMD ["npm", "run", "api"]
