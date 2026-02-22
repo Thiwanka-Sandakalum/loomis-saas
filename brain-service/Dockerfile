@@ -17,16 +17,14 @@ RUN npm run build || npx tsc
 FROM node:22-alpine AS production
 WORKDIR /app
 
-# Only copy production node_modules
-COPY --from=builder /app/node_modules ./node_modules
+
+# Copy package files and install only production dependencies
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
+RUN npm ci --only=production
 
 # Copy built output and required files
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.env.example ./
-# Optionally copy .env if present (uncomment if you want to bake in envs)
-# COPY --from=builder /app/.env ./
 COPY --from=builder /app/openapi.yaml ./
 
 # Use non-root user for security
