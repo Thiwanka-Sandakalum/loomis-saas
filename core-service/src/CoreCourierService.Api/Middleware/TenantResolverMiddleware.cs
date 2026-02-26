@@ -20,13 +20,6 @@ public class TenantResolverMiddleware
         ILogger<TenantResolverMiddleware> logger)
     {
         var path = context.Request.Path.Value ?? string.Empty;
-        var isOnboarding = path.StartsWith("/api/onboarding", StringComparison.OrdinalIgnoreCase);
-        var isPublicTracking = path.StartsWith("/api/shipments/tracking", StringComparison.OrdinalIgnoreCase);
-        var isHealth = path.StartsWith("/api/health", StringComparison.OrdinalIgnoreCase)
-                       || path.StartsWith("/health", StringComparison.OrdinalIgnoreCase)
-                       || path.StartsWith("/api/version", StringComparison.OrdinalIgnoreCase);
-        var isTelegramWebhook = path.StartsWith("/api/integrations/telegram/webhook", StringComparison.OrdinalIgnoreCase);
-
 
         var auth0UserId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         logger.LogInformation($"TenantResolverMiddleware: User Claims: {string.Join(", ", context.User.Claims.Select(c => $"{c.Type}:{c.Value}"))}");
@@ -47,21 +40,6 @@ public class TenantResolverMiddleware
                 await _next(context);
                 return;
             }
-        }
-
-        if (!isOnboarding && !isPublicTracking && !isHealth && !isTelegramWebhook)
-        {
-            logger.LogWarning("Tenant context not found for authenticated user");
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                error = new
-                {
-                    code = "TENANT_NOT_FOUND",
-                    message = "Tenant context not available"
-                }
-            });
-            return;
         }
 
         await _next(context);
