@@ -33,4 +33,4 @@ USER appuser
 
 
 # Start API server (Cloud Run sets $PORT)
-CMD ["npm", "run", "api"]
+CMD ["npm", "run", "web"]
