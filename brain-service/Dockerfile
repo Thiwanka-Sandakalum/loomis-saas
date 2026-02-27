@@ -36,4 +36,4 @@ USER appuser
 # Expose port for Cloud Run
 EXPOSE 8000
 
-CMD ["npm", "run", "web"]
+CMD ["npm", "run", "api"]
