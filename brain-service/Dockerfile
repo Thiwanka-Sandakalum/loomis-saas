@@ -27,10 +27,13 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/openapi.yaml ./
 
+
+
 # Use non-root user for security
 RUN addgroup -g 1001 appgroup && adduser -D -u 1001 -G appgroup appuser
 USER appuser
 
+# Expose port for Cloud Run
+EXPOSE 8000
 
-# Start API server (Cloud Run sets $PORT)
 CMD ["npm", "run", "web"]
