@@ -3,7 +3,7 @@ import { paymentTool } from '../../tools/paymentTool.js';
 
 export const financeAgent = new LlmAgent({
     name: 'finance_records_agent',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     description: 'Handles payments and financial records.',
     instruction: `You are the Finance & Records Agent for Courier Service.
 Your specialized goal is to process payments for shipments using 'process_payment'.

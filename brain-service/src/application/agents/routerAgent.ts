@@ -7,7 +7,7 @@ import { adminAgent } from './adminAgent.js';
 
 export const routerAgent = new LlmAgent({
     name: 'intent_router_agent',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     description: 'Analyzes user intent and immediately delegates to specialized domain agents.',
     instruction: `You are the Intent Router for an AI-powered Courier Service.
 Your ONLY job is to analyze the user's message and immediately use transfer_to_agent to delegate to the correct agent. Never answer the user's question yourself.

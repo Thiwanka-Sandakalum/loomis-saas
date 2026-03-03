@@ -4,7 +4,7 @@ import { complaintTool } from '../../tools/complaintTool.js';
 
 export const supportAgent = new LlmAgent({
     name: 'support_agent',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     description: 'Handles customer complaints and general inquiries/FAQs.',
     instruction: `You are the Support Agent for Courier Service.
 Your specialized goals are:

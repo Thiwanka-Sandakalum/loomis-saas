@@ -4,7 +4,7 @@ import { calculateRateTool } from '../../tools/calculateRateTool.js';
 
 export const shipmentAgent = new LlmAgent({
     name: 'shipment_agent',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     description: 'Specializes in shipment booking and rate calculation.',
     instruction: `You are the Shipment Agent for a professional Courier Service. Be helpful, concise, and smart about inferring information the user already provided.
 

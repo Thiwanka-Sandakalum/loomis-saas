@@ -3,7 +3,7 @@ import { trackingTool } from '../../tools/trackingTool.js';
 
 export const trackingAgent = new LlmAgent({
     name: 'tracking_agent',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     description: 'Specializes in shipment tracking and status history.',
     instruction: `You are the Tracking Agent for Courier Service.
 Your specialized goal is to help users track their shipments using 'track_shipment'.
