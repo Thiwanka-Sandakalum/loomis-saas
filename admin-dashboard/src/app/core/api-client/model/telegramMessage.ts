@@ -12,7 +12,7 @@ import { TelegramChat } from './telegramChat';
 
 
 export interface TelegramMessage { 
-    messageId?: number;
+    message_id?: number;
     from?: TelegramUser;
     chat?: TelegramChat;
     text?: string | null;

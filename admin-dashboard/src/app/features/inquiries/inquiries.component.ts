@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InquiryService } from '../../core/services';
 import { Inquiry } from '../../core/models';
+import { TelegramService } from '../../core/api-client/api/telegram.service';
 import { LoadingSpinnerComponent, EmptyStateComponent } from '../../shared/components';
 import { TimeAgoPipe } from '../../shared/pipes';
+import { TelegramChat } from '../../core/api-client/model/telegramChat';
 
 @Component({
   selector: 'app-inquiries',
@@ -154,7 +156,9 @@ import { TimeAgoPipe } from '../../shared/pipes';
                     <td class="py-4 px-6 align-top">
                       <div class="flex flex-col">
                         <span class="text-sm font-semibold text-slate-900 dark:text-white">{{ inquiry.customerName }}</span>
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{{ inquiry.customerPhone || 'N/A' }}</span>
+                        <span *ngIf="isTelegramInquiry(inquiry)" class="text-xs text-blue-500 font-mono mt-0.5">Chat ID: {{ inquiry.id }}</span>
+                        <span *ngIf="isTelegramInquiry(inquiry) && inquiry.messageCount !== undefined" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Messages: {{ inquiry.messageCount }}</span>
+                        <span *ngIf="!isTelegramInquiry(inquiry)" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{{ inquiry.customerPhone || 'N/A' }}</span>
                       </div>
                     </td>
 
@@ -162,7 +166,7 @@ import { TimeAgoPipe } from '../../shared/pipes';
                     <td class="py-4 px-6 align-top">
                       <div class="flex flex-col gap-2">
                         <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 italic">
-                          "{{ inquiry.messagePreview }}"
+                          {{ isTelegramInquiry(inquiry) ? '' : '"' + inquiry.messagePreview + '"' }}
                         </p>
                         <div class="flex items-center gap-3">
                           <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
@@ -248,9 +252,18 @@ import { TimeAgoPipe } from '../../shared/pipes';
 })
 export default class InquiriesComponent implements OnInit {
   private inquiryService = inject(InquiryService);
+  private telegramService = inject(TelegramService);
 
   // State
   inquiries = signal<Inquiry[]>([]);
+
+  telegramChats = signal<TelegramChat[]>([]);
+  isTelegramLoading = signal(false);
+
+  // Telegram chat message viewing state
+  selectedTelegramChatId = signal<string | null>(null);
+  telegramMessages = signal<any[]>([]); // Use TelegramMessageResponse type if available
+  isTelegramMessagesLoading = signal(false);
 
   isLoading = signal(false);
   totalItems = signal(0);
@@ -265,6 +278,21 @@ export default class InquiriesComponent implements OnInit {
     const channel = this.channelFilter();
     const status = this.statusFilter();
     const query = this.searchQuery().toLowerCase();
+
+    // If Telegram channel is selected, show telegramChats as inquiries
+    if (channel === 'telegram') {
+      return this.telegramChats().map((chat: any) => ({
+        id: chat.chatId?.toString() ?? chat.id?.toString() ?? '',
+        customerName: chat.userName || chat.firstName || chat.lastName || chat.title || 'Telegram Chat',
+        customerPhone: '',
+        messagePreview: '',
+        channel: 'telegram',
+        status: 'open',
+        createdAt: chat.lastMessageAt ? new Date(chat.lastMessageAt) : (chat.createdAt ? new Date(chat.createdAt) : new Date()),
+        messageCount: chat.messageCount ?? 0,
+        isTelegram: true,
+      }));
+    }
 
     return this.inquiries().filter(inquiry => {
       const matchesChannel = !channel || inquiry.channel === channel;
@@ -284,9 +312,17 @@ export default class InquiriesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadInquiries();
+    if (this.channelFilter() === 'telegram') {
+      this.loadTelegramChats();
+    }
   }
 
   loadInquiries(): void {
+    // If Telegram channel is selected, load Telegram chats instead
+    if (this.channelFilter() === 'telegram') {
+      this.loadTelegramChats();
+      return;
+    }
     this.isLoading.set(true);
     this.inquiryService.getInquiries({
       page: this.page(),
@@ -309,6 +345,23 @@ export default class InquiriesComponent implements OnInit {
     });
   }
 
+  loadTelegramChats(): void {
+    this.isTelegramLoading.set(true);
+    this.telegramService.apiTelegramChatsGet().subscribe({
+      next: (response) => {
+        // If response is an array, use it directly. If it's an object, adjust accordingly.
+        const chats = Array.isArray(response) ? response : (response as any)?.chats ?? [];
+        this.telegramChats.set(chats);
+        this.totalItems.set(chats.length);
+        this.isTelegramLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load Telegram chats:', error);
+        this.isTelegramLoading.set(false);
+      }
+    });
+  }
+
   onStatusChange(status: string): void {
     this.statusFilter.set(status);
     this.page.set(1);
@@ -322,7 +375,11 @@ export default class InquiriesComponent implements OnInit {
       this.channelFilter.set(channel);
     }
     this.page.set(1);
-    this.loadInquiries();
+    if (channel === 'telegram') {
+      this.loadTelegramChats();
+    } else {
+      this.loadInquiries();
+    }
   }
 
   goToPage(page: number): void {
@@ -353,5 +410,41 @@ export default class InquiriesComponent implements OnInit {
 
   exportData(): void {
     console.log('Exporting data...');
+  }
+
+  // Telegram chat message viewing logic
+  viewTelegramConversation(chatId: string): void {
+    this.selectedTelegramChatId.set(chatId);
+    this.isTelegramMessagesLoading.set(true);
+    this.telegramService.apiTelegramChatsChatIdMessagesGet(chatId, 0, 100).subscribe({
+      next: (response: any) => {
+        this.telegramMessages.set(response.messages ?? response.Messages ?? []);
+        this.isTelegramMessagesLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load Telegram messages:', error);
+        this.isTelegramMessagesLoading.set(false);
+      }
+    });
+  }
+
+  closeTelegramConversation(): void {
+    this.selectedTelegramChatId.set(null);
+    this.telegramMessages.set([]);
+  }
+
+  // TrackBy function for ngFor
+  trackByInquiryId(index: number, inquiry: any) {
+    return inquiry.id;
+  }
+
+  // Type guard for Telegram inquiries
+  public isTelegramInquiry(inquiry: any): inquiry is { chatId: string; messageCount?: number } {
+    return (
+      inquiry &&
+      typeof inquiry === 'object' &&
+      'chatId' in inquiry &&
+      inquiry.channel === 'telegram'
+    );
   }
 }

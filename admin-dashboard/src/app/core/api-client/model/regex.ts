@@ -7,7 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { RegexOptions } from './regex-options';
+import { RegexOptions } from './regexOptions';
 
 
 export interface Regex { 

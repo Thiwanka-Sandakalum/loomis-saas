@@ -27,33 +27,16 @@ import { AIRateInquiryRequest } from '../model/aIRateInquiryRequest';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    AIBrainServiceInterface
+} from './aIBrain.serviceInterface';
 
-
-export interface ApiAiComplaintsFilePostRequestParams {
-    aIFileComplaintRequest?: AIFileComplaintRequest;
-}
-
-export interface ApiAiCustomersPhoneOrEmailGetRequestParams {
-    phoneOrEmail: string;
-}
-
-export interface ApiAiRatesInquiryPostRequestParams {
-    aIRateInquiryRequest?: AIRateInquiryRequest;
-}
-
-export interface ApiAiShipmentsCreatePostRequestParams {
-    aICreateShipmentRequest?: AICreateShipmentRequest;
-}
-
-export interface ApiAiShipmentsTrackingTrackingNumberGetRequestParams {
-    trackingNumber: string;
-}
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class AIBrainService extends BaseService {
+export class AIBrainService extends BaseService implements AIBrainServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
@@ -61,16 +44,15 @@ export class AIBrainService extends BaseService {
 
     /**
      * @endpoint post /api/ai/complaints/file
-     * @param requestParameters
+     * @param aIFileComplaintRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiAiComplaintsFilePost(requestParameters?: ApiAiComplaintsFilePostRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiAiComplaintsFilePost(requestParameters?: ApiAiComplaintsFilePostRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiAiComplaintsFilePost(requestParameters?: ApiAiComplaintsFilePostRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiAiComplaintsFilePost(requestParameters?: ApiAiComplaintsFilePostRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const aIFileComplaintRequest = requestParameters?.aIFileComplaintRequest;
+    public apiAiComplaintsFilePost(aIFileComplaintRequest?: AIFileComplaintRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiAiComplaintsFilePost(aIFileComplaintRequest?: AIFileComplaintRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiAiComplaintsFilePost(aIFileComplaintRequest?: AIFileComplaintRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiAiComplaintsFilePost(aIFileComplaintRequest?: AIFileComplaintRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -125,16 +107,15 @@ export class AIBrainService extends BaseService {
 
     /**
      * @endpoint get /api/ai/customers/{phoneOrEmail}
-     * @param requestParameters
+     * @param phoneOrEmail 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiAiCustomersPhoneOrEmailGet(requestParameters: ApiAiCustomersPhoneOrEmailGetRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiAiCustomersPhoneOrEmailGet(requestParameters: ApiAiCustomersPhoneOrEmailGetRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiAiCustomersPhoneOrEmailGet(requestParameters: ApiAiCustomersPhoneOrEmailGetRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiAiCustomersPhoneOrEmailGet(requestParameters: ApiAiCustomersPhoneOrEmailGetRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const phoneOrEmail = requestParameters?.phoneOrEmail;
+    public apiAiCustomersPhoneOrEmailGet(phoneOrEmail: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiAiCustomersPhoneOrEmailGet(phoneOrEmail: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiAiCustomersPhoneOrEmailGet(phoneOrEmail: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiAiCustomersPhoneOrEmailGet(phoneOrEmail: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (phoneOrEmail === null || phoneOrEmail === undefined) {
             throw new Error('Required parameter phoneOrEmail was null or undefined when calling apiAiCustomersPhoneOrEmailGet.');
         }
@@ -180,16 +161,15 @@ export class AIBrainService extends BaseService {
 
     /**
      * @endpoint post /api/ai/rates/inquiry
-     * @param requestParameters
+     * @param aIRateInquiryRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiAiRatesInquiryPost(requestParameters?: ApiAiRatesInquiryPostRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiAiRatesInquiryPost(requestParameters?: ApiAiRatesInquiryPostRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiAiRatesInquiryPost(requestParameters?: ApiAiRatesInquiryPostRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiAiRatesInquiryPost(requestParameters?: ApiAiRatesInquiryPostRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const aIRateInquiryRequest = requestParameters?.aIRateInquiryRequest;
+    public apiAiRatesInquiryPost(aIRateInquiryRequest?: AIRateInquiryRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiAiRatesInquiryPost(aIRateInquiryRequest?: AIRateInquiryRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiAiRatesInquiryPost(aIRateInquiryRequest?: AIRateInquiryRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiAiRatesInquiryPost(aIRateInquiryRequest?: AIRateInquiryRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -244,16 +224,15 @@ export class AIBrainService extends BaseService {
 
     /**
      * @endpoint post /api/ai/shipments/create
-     * @param requestParameters
+     * @param aICreateShipmentRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiAiShipmentsCreatePost(requestParameters?: ApiAiShipmentsCreatePostRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiAiShipmentsCreatePost(requestParameters?: ApiAiShipmentsCreatePostRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiAiShipmentsCreatePost(requestParameters?: ApiAiShipmentsCreatePostRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiAiShipmentsCreatePost(requestParameters?: ApiAiShipmentsCreatePostRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const aICreateShipmentRequest = requestParameters?.aICreateShipmentRequest;
+    public apiAiShipmentsCreatePost(aICreateShipmentRequest?: AICreateShipmentRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiAiShipmentsCreatePost(aICreateShipmentRequest?: AICreateShipmentRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiAiShipmentsCreatePost(aICreateShipmentRequest?: AICreateShipmentRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiAiShipmentsCreatePost(aICreateShipmentRequest?: AICreateShipmentRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -308,16 +287,15 @@ export class AIBrainService extends BaseService {
 
     /**
      * @endpoint get /api/ai/shipments/tracking/{trackingNumber}
-     * @param requestParameters
+     * @param trackingNumber 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiAiShipmentsTrackingTrackingNumberGet(requestParameters: ApiAiShipmentsTrackingTrackingNumberGetRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiAiShipmentsTrackingTrackingNumberGet(requestParameters: ApiAiShipmentsTrackingTrackingNumberGetRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiAiShipmentsTrackingTrackingNumberGet(requestParameters: ApiAiShipmentsTrackingTrackingNumberGetRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiAiShipmentsTrackingTrackingNumberGet(requestParameters: ApiAiShipmentsTrackingTrackingNumberGetRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const trackingNumber = requestParameters?.trackingNumber;
+    public apiAiShipmentsTrackingTrackingNumberGet(trackingNumber: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiAiShipmentsTrackingTrackingNumberGet(trackingNumber: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiAiShipmentsTrackingTrackingNumberGet(trackingNumber: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiAiShipmentsTrackingTrackingNumberGet(trackingNumber: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (trackingNumber === null || trackingNumber === undefined) {
             throw new Error('Required parameter trackingNumber was null or undefined when calling apiAiShipmentsTrackingTrackingNumberGet.');
         }

@@ -17,29 +17,30 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { SetupTelegramRequest } from '../model/setup-telegram-request';
+import { SetupTelegramRequest } from '../model/setupTelegramRequest';
 // @ts-ignore
-import { TelegramIntegrationResponse } from '../model/telegram-integration-response';
+import { TelegramIntegrationResponse } from '../model/telegramIntegrationResponse';
 // @ts-ignore
-import { TelegramStatusResponse } from '../model/telegram-status-response';
+import { TelegramStatusResponse } from '../model/telegramStatusResponse';
 // @ts-ignore
-import { TelegramUpdate } from '../model/telegram-update';
+import { TelegramWebhookInfo } from '../model/telegramWebhookInfo';
 // @ts-ignore
-import { TelegramWebhookInfo } from '../model/telegram-webhook-info';
-// @ts-ignore
-import { TestConnectionRequest } from '../model/test-connection-request';
+import { TestConnectionRequest } from '../model/testConnectionRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    IntegrationsServiceInterface
+} from './integrations.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class IntegrationsService extends BaseService {
+export class IntegrationsService extends BaseService implements IntegrationsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
@@ -333,15 +334,14 @@ export class IntegrationsService extends BaseService {
     /**
      * @endpoint post /api/integrations/telegram/webhook/{tenantId}
      * @param tenantId 
-     * @param telegramUpdate 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, telegramUpdate?: TelegramUpdate, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, telegramUpdate?: TelegramUpdate, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, telegramUpdate?: TelegramUpdate, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, telegramUpdate?: TelegramUpdate, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiIntegrationsTelegramWebhookTenantIdPost(tenantId: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (tenantId === null || tenantId === undefined) {
             throw new Error('Required parameter tenantId was null or undefined when calling apiIntegrationsTelegramWebhookTenantIdPost.');
         }
@@ -359,17 +359,6 @@ export class IntegrationsService extends BaseService {
         const localVarTransferCache: boolean = options?.transferCache ?? true;
 
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json',
-            'text/json',
-            'application/*+json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -386,7 +375,6 @@ export class IntegrationsService extends BaseService {
         return this.httpClient.request<any>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: telegramUpdate,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

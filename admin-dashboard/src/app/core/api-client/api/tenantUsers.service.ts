@@ -29,30 +29,16 @@ import { UpdateTenantUserRoleRequest } from '../model/updateTenantUserRoleReques
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    TenantUsersServiceInterface
+} from './tenantUsers.serviceInterface';
 
-
-export interface ApiTenantUsersInvitePostRequestParams {
-    inviteTenantUserRequest?: InviteTenantUserRequest;
-}
-
-export interface ApiTenantUsersPostRequestParams {
-    createTenantUserRequest?: CreateTenantUserRequest;
-}
-
-export interface ApiTenantUsersTenantUserIdDeleteRequestParams {
-    tenantUserId: string;
-}
-
-export interface ApiTenantUsersTenantUserIdRolePatchRequestParams {
-    tenantUserId: string;
-    updateTenantUserRoleRequest?: UpdateTenantUserRoleRequest;
-}
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class TenantUsersService extends BaseService {
+export class TenantUsersService extends BaseService implements TenantUsersServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
@@ -113,16 +99,15 @@ export class TenantUsersService extends BaseService {
 
     /**
      * @endpoint post /api/tenant-users/invite
-     * @param requestParameters
+     * @param inviteTenantUserRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiTenantUsersInvitePost(requestParameters?: ApiTenantUsersInvitePostRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<TenantUserResponse>;
-    public apiTenantUsersInvitePost(requestParameters?: ApiTenantUsersInvitePostRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TenantUserResponse>>;
-    public apiTenantUsersInvitePost(requestParameters?: ApiTenantUsersInvitePostRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TenantUserResponse>>;
-    public apiTenantUsersInvitePost(requestParameters?: ApiTenantUsersInvitePostRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const inviteTenantUserRequest = requestParameters?.inviteTenantUserRequest;
+    public apiTenantUsersInvitePost(inviteTenantUserRequest?: InviteTenantUserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<TenantUserResponse>;
+    public apiTenantUsersInvitePost(inviteTenantUserRequest?: InviteTenantUserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TenantUserResponse>>;
+    public apiTenantUsersInvitePost(inviteTenantUserRequest?: InviteTenantUserRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TenantUserResponse>>;
+    public apiTenantUsersInvitePost(inviteTenantUserRequest?: InviteTenantUserRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -180,16 +165,15 @@ export class TenantUsersService extends BaseService {
 
     /**
      * @endpoint post /api/tenant-users
-     * @param requestParameters
+     * @param createTenantUserRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiTenantUsersPost(requestParameters?: ApiTenantUsersPostRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<TenantUserResponse>;
-    public apiTenantUsersPost(requestParameters?: ApiTenantUsersPostRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TenantUserResponse>>;
-    public apiTenantUsersPost(requestParameters?: ApiTenantUsersPostRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TenantUserResponse>>;
-    public apiTenantUsersPost(requestParameters?: ApiTenantUsersPostRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const createTenantUserRequest = requestParameters?.createTenantUserRequest;
+    public apiTenantUsersPost(createTenantUserRequest?: CreateTenantUserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<TenantUserResponse>;
+    public apiTenantUsersPost(createTenantUserRequest?: CreateTenantUserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TenantUserResponse>>;
+    public apiTenantUsersPost(createTenantUserRequest?: CreateTenantUserRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TenantUserResponse>>;
+    public apiTenantUsersPost(createTenantUserRequest?: CreateTenantUserRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/plain' | 'application/json' | 'text/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -247,16 +231,15 @@ export class TenantUsersService extends BaseService {
 
     /**
      * @endpoint delete /api/tenant-users/{tenantUserId}
-     * @param requestParameters
+     * @param tenantUserId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiTenantUsersTenantUserIdDelete(requestParameters: ApiTenantUsersTenantUserIdDeleteRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiTenantUsersTenantUserIdDelete(requestParameters: ApiTenantUsersTenantUserIdDeleteRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiTenantUsersTenantUserIdDelete(requestParameters: ApiTenantUsersTenantUserIdDeleteRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiTenantUsersTenantUserIdDelete(requestParameters: ApiTenantUsersTenantUserIdDeleteRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const tenantUserId = requestParameters?.tenantUserId;
+    public apiTenantUsersTenantUserIdDelete(tenantUserId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiTenantUsersTenantUserIdDelete(tenantUserId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiTenantUsersTenantUserIdDelete(tenantUserId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiTenantUsersTenantUserIdDelete(tenantUserId: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (tenantUserId === null || tenantUserId === undefined) {
             throw new Error('Required parameter tenantUserId was null or undefined when calling apiTenantUsersTenantUserIdDelete.');
         }
@@ -302,20 +285,19 @@ export class TenantUsersService extends BaseService {
 
     /**
      * @endpoint patch /api/tenant-users/{tenantUserId}/role
-     * @param requestParameters
+     * @param tenantUserId 
+     * @param updateTenantUserRoleRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiTenantUsersTenantUserIdRolePatch(requestParameters: ApiTenantUsersTenantUserIdRolePatchRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public apiTenantUsersTenantUserIdRolePatch(requestParameters: ApiTenantUsersTenantUserIdRolePatchRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public apiTenantUsersTenantUserIdRolePatch(requestParameters: ApiTenantUsersTenantUserIdRolePatchRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public apiTenantUsersTenantUserIdRolePatch(requestParameters: ApiTenantUsersTenantUserIdRolePatchRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const tenantUserId = requestParameters?.tenantUserId;
+    public apiTenantUsersTenantUserIdRolePatch(tenantUserId: string, updateTenantUserRoleRequest?: UpdateTenantUserRoleRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public apiTenantUsersTenantUserIdRolePatch(tenantUserId: string, updateTenantUserRoleRequest?: UpdateTenantUserRoleRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public apiTenantUsersTenantUserIdRolePatch(tenantUserId: string, updateTenantUserRoleRequest?: UpdateTenantUserRoleRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public apiTenantUsersTenantUserIdRolePatch(tenantUserId: string, updateTenantUserRoleRequest?: UpdateTenantUserRoleRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (tenantUserId === null || tenantUserId === undefined) {
             throw new Error('Required parameter tenantUserId was null or undefined when calling apiTenantUsersTenantUserIdRolePatch.');
         }
-        const updateTenantUserRoleRequest = requestParameters?.updateTenantUserRoleRequest;
 
         let localVarHeaders = this.defaultHeaders;
 

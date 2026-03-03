@@ -70,10 +70,10 @@ function weightRangeValidator(group: AbstractControl): ValidationErrors | null {
           </span>
         </div>
 
-        <!-- Empty state: only shown when no rates at all (shouldn't normally happen) -->
+        <!-- Empty state: shown when no rates exist -->
         <div *ngIf="rates.length === 0" class="empty-state">
           <span class="material-symbols-outlined">price_change</span>
-          <p>No service rates yet. Add your first rate below.</p>
+          <p>No service types or rates defined yet. Click "Add Service Rate" to begin.</p>
         </div>
 
         <!-- Form -->
@@ -85,25 +85,14 @@ function weightRangeValidator(group: AbstractControl): ValidationErrors | null {
               *ngFor="let rate of rates.controls; let i = index"
               [formGroupName]="i"
               class="rate-card"
-              [class.rate-card--disabled]="!rate.get('enabled')?.value"
             >
               <!-- Card top bar -->
               <div class="rate-card-header">
                 <div class="rate-card-title">
                   <span class="rate-index">{{ i + 1 }}</span>
                   <span class="rate-label">{{ rate.get('serviceType')?.value || 'New Rate' }}</span>
-                  <span *ngIf="isRequiredRate(i)" class="badge-required">
-                    <span class="material-symbols-outlined">lock</span> Required
-                  </span>
                 </div>
                 <div class="rate-card-actions">
-                  <label class="toggle" [title]="rate.get('enabled')?.value ? 'Disable rate' : 'Enable rate'">
-                    <input type="checkbox" formControlName="enabled" />
-                    <span class="toggle-track">
-                      <span class="toggle-thumb"></span>
-                    </span>
-                    <span class="toggle-label">{{ rate.get('enabled')?.value ? 'Active' : 'Inactive' }}</span>
-                  </label>
                   <button
                     type="button"
                     class="btn-remove"
@@ -480,10 +469,7 @@ function weightRangeValidator(group: AbstractControl): ValidationErrors | null {
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px rgba(59,130,246,.1);
     }
-
-    .rate-card--disabled {
-      opacity: .6;
-    }
+      
 
     .rate-card-header {
       display: flex;
@@ -820,13 +806,9 @@ export class ServiceRatesComponent {
   errorDetails: string[] = [];
   successMessage: string | null = null;
 
-  // All service types the API requires — must always be present
-  readonly requiredServiceTypes = ['Standard', 'Express', 'Overnight'] as const;
-
+  // No predefined service types; user must add at least one
   form = this.fb.group({
-    rates: this.fb.array<FormGroup>(
-      this.requiredServiceTypes.map(type => this.buildRateGroup(type))
-    ),
+    rates: this.fb.array<FormGroup>([]),
   });
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -835,19 +817,17 @@ export class ServiceRatesComponent {
     return this.form.get('rates') as FormArray;
   }
 
-  private buildRateGroup(serviceType = ''): FormGroup {
-    const isRequired = (this.requiredServiceTypes as readonly string[]).includes(serviceType);
+  private buildRateGroup(): FormGroup {
     return this.fb.group(
       {
-        // Pre-seeded required types are locked — user cannot rename them
-        serviceType: [{ value: serviceType, disabled: isRequired }, isRequired ? [] : [Validators.required]],
+        serviceType: ['', [Validators.required]],
         zone: ['', [Validators.required]],
         baseRate: [null as number | null, [Validators.required, positiveNumberValidator]],
         additionalPerKg: [null as number | null, [Validators.required, positiveNumberValidator]],
         minWeight: [null as number | null, [positiveNumberValidator]],
         maxWeight: [null as number | null, [positiveNumberValidator]],
         notes: [''],
-        enabled: [true],
+        // enabled: [true],
       },
       { validators: weightRangeValidator }
     );
@@ -868,8 +848,9 @@ export class ServiceRatesComponent {
 
   // ── Rate management ───────────────────────────────────────────────────────
 
+  // No required rates anymore
   isRequiredRate(index: number): boolean {
-    return index < this.requiredServiceTypes.length;
+    return false;
   }
 
   addRate(): void {
@@ -884,13 +865,12 @@ export class ServiceRatesComponent {
   // ── Submit ────────────────────────────────────────────────────────────────
 
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.rates.length === 0) {
+      this.error = 'You must define at least one service type and rate.';
       return;
     }
-
-    if (this.rates.length === 0) {
-      this.error = 'Please add at least one service rate.';
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 

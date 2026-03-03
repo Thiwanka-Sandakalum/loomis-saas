@@ -17,27 +17,30 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { CreateEventRequest } from '../model/create-event-request';
+import { CreateEventRequest } from '../model/createEventRequest';
 // @ts-ignore
-import { CreateShipmentRequest } from '../model/create-shipment-request';
+import { CreateShipmentRequest } from '../model/createShipmentRequest';
 // @ts-ignore
-import { ShipmentResponse } from '../model/shipment-response';
+import { ShipmentResponse } from '../model/shipmentResponse';
 // @ts-ignore
-import { ShipmentResponsePagedResponse } from '../model/shipment-response-paged-response';
+import { ShipmentResponsePagedResponse } from '../model/shipmentResponsePagedResponse';
 // @ts-ignore
-import { UpdateStatusRequest } from '../model/update-status-request';
+import { UpdateStatusRequest } from '../model/updateStatusRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    ShipmentsServiceInterface
+} from './shipments.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ShipmentsService extends BaseService {
+export class ShipmentsService extends BaseService implements ShipmentsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

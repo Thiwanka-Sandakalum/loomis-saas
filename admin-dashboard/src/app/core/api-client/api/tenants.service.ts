@@ -17,21 +17,24 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { CreateTenantRequest } from '../model/create-tenant-request';
+import { CreateTenantRequest } from '../model/createTenantRequest';
 // @ts-ignore
-import { TenantResponse } from '../model/tenant-response';
+import { TenantResponse } from '../model/tenantResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    TenantsServiceInterface
+} from './tenants.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class TenantsService extends BaseService {
+export class TenantsService extends BaseService implements TenantsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

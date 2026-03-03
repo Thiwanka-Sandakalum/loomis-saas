@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { OnboardingService } from '../../core/api-client/api/onboarding.service';
-import { OnboardingStatusResponse } from '../../core/api-client/model/onboarding-status-response';
+import { OnboardingStatusResponse } from '../api-client';
 
 @Injectable({ providedIn: 'root' })
 export class OnboardingStatusService {

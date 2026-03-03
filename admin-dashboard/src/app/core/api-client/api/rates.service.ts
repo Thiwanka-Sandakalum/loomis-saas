@@ -17,23 +17,26 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { CalculateRateRequest } from '../model/calculate-rate-request';
+import { CalculateRateRequest } from '../model/calculateRateRequest';
 // @ts-ignore
-import { CreateRateRequest } from '../model/create-rate-request';
+import { CreateRateRequest } from '../model/createRateRequest';
 // @ts-ignore
-import { UpdateRateRequest } from '../model/update-rate-request';
+import { UpdateRateRequest } from '../model/updateRateRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    RatesServiceInterface
+} from './rates.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class RatesService extends BaseService {
+export class RatesService extends BaseService implements RatesServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

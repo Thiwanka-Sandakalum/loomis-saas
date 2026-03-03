@@ -444,13 +444,21 @@ export class CompanySetupComponent {
 
   // Error message map – one place to change copy
   private readonly errorMessages: Record<string, Record<string, string>> = {
-    organizationName: { required: 'Organization name is required.' },
+    organizationName: {
+      required: 'Organization name is required.',
+      minlength: 'Organization name must be at least 2 characters.',
+      maxlength: 'Organization name must be at most 100 characters.'
+    },
     corporateWebsite: {
       required: 'Corporate website is required.',
       url: 'Enter a valid website URL (e.g. https://yourcompany.com).',
     },
     primaryLanguage: { required: 'Primary language is required.' },
-    description: { required: 'Description is required.' },
+    description: {
+      required: 'Description is required.',
+      minlength: 'Description must be at least 10 characters.',
+      maxlength: 'Description must be at most 500 characters.'
+    },
     supportEmail: {
       required: 'Support email is required.',
       email: 'Enter a valid email address.',
@@ -459,17 +467,30 @@ export class CompanySetupComponent {
       required: 'Support phone is required.',
       phone: 'Enter a valid phone number (e.g. +1 555-123-4567).',
     },
-    headquartersAddress: { required: 'Headquarters address is required.' },
+    headquartersAddress: {
+      required: 'Headquarters address is required.',
+      minlength: 'Address must be at least 5 characters.',
+      maxlength: 'Address must be at most 200 characters.'
+    },
   };
 
   form = this.fb.nonNullable.group({
-    organizationName: ['', [Validators.required]],
+    organizationName: [
+      '',
+      [Validators.required, Validators.minLength(2), Validators.maxLength(100)]
+    ],
     corporateWebsite: ['', [Validators.required, urlValidator]],
     primaryLanguage: ['', [Validators.required]],
-    description: ['', [Validators.required]],
+    description: [
+      '',
+      [Validators.required, Validators.minLength(10), Validators.maxLength(500)]
+    ],
     supportEmail: ['', [Validators.required, Validators.email]],
     supportPhone: ['', [Validators.required, phoneValidator]],
-    headquartersAddress: ['', [Validators.required]],
+    headquartersAddress: [
+      '',
+      [Validators.required, Validators.minLength(5), Validators.maxLength(200)]
+    ],
   });
 
   // ── Helpers ──────────────────────────────────────────────────────────────

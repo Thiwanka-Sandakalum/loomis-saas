@@ -17,29 +17,32 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { AcceptInviteRequest } from '../model/accept-invite-request';
+import { AcceptInviteRequest } from '../model/acceptInviteRequest';
 // @ts-ignore
-import { CompanyProfileRequest } from '../model/company-profile-request';
+import { CompanyProfileRequest } from '../model/companyProfileRequest';
 // @ts-ignore
-import { OnboardingRatesRequest } from '../model/onboarding-rates-request';
+import { OnboardingRatesRequest } from '../model/onboardingRatesRequest';
 // @ts-ignore
-import { OnboardingResponse } from '../model/onboarding-response';
+import { OnboardingResponse } from '../model/onboardingResponse';
 // @ts-ignore
-import { OnboardingStatusResponse } from '../model/onboarding-status-response';
+import { OnboardingStatusResponse } from '../model/onboardingStatusResponse';
 // @ts-ignore
-import { SetupTenantRequest } from '../model/setup-tenant-request';
+import { SetupTenantRequest } from '../model/setupTenantRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    OnboardingServiceInterface
+} from './onboarding.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class OnboardingService extends BaseService {
+export class OnboardingService extends BaseService implements OnboardingServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

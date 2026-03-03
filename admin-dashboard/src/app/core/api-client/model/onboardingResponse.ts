@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { OnboardingStatus } from './onboardingStatus';
 
 
 export interface OnboardingResponse { 
@@ -16,5 +17,6 @@ export interface OnboardingResponse {
     plan?: string | null;
     role?: string | null;
     message?: string | null;
+    onboarding?: OnboardingStatus;
 }
 

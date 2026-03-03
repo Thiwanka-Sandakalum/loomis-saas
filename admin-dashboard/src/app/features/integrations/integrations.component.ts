@@ -205,27 +205,6 @@ interface Toast {
               </div>
             }
 
-            <!-- ── WEBHOOKS form ── -->
-            @if (activeModal() === 'webhooks') {
-              <div class="flex flex-col gap-4">
-                <label class="flex flex-col gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Endpoint URL <span class="text-red-500">*</span>
-                  <input type="url"
-                    [value]="webhookEndpoint()"
-                    (input)="webhookEndpoint.set(($any($event.target)).value)"
-                    placeholder="https://yoursite.com/webhooks/loomis"
-                    class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-primary transition-colors" />
-                </label>
-                <div>
-                  <p class="text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Subscribed events</p>
-                  <div class="flex flex-wrap gap-1.5">
-                    @for (evt of webhookEvents; track evt) {
-                      <span class="rounded-md bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300">{{ evt }}</span>
-                    }
-                  </div>
-                </div>
-              </div>
-            }
 
           </div>
 
@@ -340,69 +319,6 @@ interface Toast {
         }
       </div>
 
-      <!-- API Key / Webhooks panel — always visible -->
-      <div class="flex flex-col gap-4">
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="material-symbols-outlined text-[20px] text-primary">vpn_key</span>
-          API &amp; Webhooks
-        </h2>
-
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col gap-6">
-          <!-- API Key row -->
-          <div>
-            <label class="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">Production API Key</label>
-            <div class="flex items-center gap-2 flex-wrap">
-              <div class="flex-1 min-w-0 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 font-mono text-sm text-slate-600 dark:text-slate-400 truncate">
-                cmp_live_o90dz5a7ddd89s7d897s9d87…
-              </div>
-              <button (click)="copyApiKey()"
-                class="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap">
-                <span class="material-symbols-outlined text-[15px]">content_copy</span> Copy
-              </button>
-              <button class="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap">
-                <span class="material-symbols-outlined text-[15px]">autorenew</span> Regenerate
-              </button>
-              <button class="flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/30 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors whitespace-nowrap">
-                <span class="material-symbols-outlined text-[15px]">delete</span> Revoke
-              </button>
-            </div>
-          </div>
-
-          <!-- Webhooks row -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">Webhook URL</label>
-              <span class="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-                <span class="material-symbols-outlined text-[14px]">check_circle</span> Verified
-              </span>
-            </div>
-            <div class="flex items-center gap-2">
-              <input type="url" value="https://yoursite.com/webhooks/loomis" readonly
-                class="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
-              <button class="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap">
-                <span class="material-symbols-outlined text-[15px]">bolt</span> Test
-              </button>
-            </div>
-            <div class="mt-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Subscribed Events</p>
-              <div class="flex flex-wrap gap-1.5">
-                @for (evt of webhookEvents; track evt) {
-                  <span class="rounded bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-xs font-medium text-slate-700 dark:text-slate-300">{{ evt }}</span>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button class="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-              <span class="material-symbols-outlined text-[17px]">menu_book</span> API Docs
-            </button>
-            <button class="text-sm font-medium text-primary hover:underline flex items-center gap-1">
-              <span class="material-symbols-outlined text-[17px]">science</span> Sandbox
-            </button>
-          </div>
-        </div>
-      </div>
 
     </div>
   `,
@@ -460,7 +376,6 @@ export default class IntegrationsComponent implements OnInit {
     if (id === 'telegram') this.connectTelegram();
     else if (id === 'gmail') this.connectGmail();
     else if (id === 'n8n') this.connectN8n();
-    else if (id === 'webhooks') this.saveWebhook();
     else {
       // Generic / coming soon path: just enable the card
       this.markEnabled(id, true);
@@ -550,10 +465,11 @@ export default class IntegrationsComponent implements OnInit {
     {
       id: 'webhooks',
       name: 'Webhooks',
-      svgIcon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/webhook.svg',
+      svgIcon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/webhooks.svg',
       description: 'Push real-time shipment, payment and complaint events to any endpoint. Integrate with your own systems instantly.',
       category: 'automation',
-      enabled: true,
+      enabled: false,
+      comingSoon: true,
       iconBg: 'bg-slate-100 dark:bg-slate-800',
     },
     {
@@ -610,9 +526,6 @@ export default class IntegrationsComponent implements OnInit {
     if (evt) evt.checked = !evt.checked;
   }
 
-  // ── Webhooks state ────────────────────────────────────────────────────────
-  webhookEndpoint = signal('https://yoursite.com/webhooks/loomis');
-  readonly webhookEvents = ['shipment.created', 'shipment.updated', 'payment.completed'];
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -684,18 +597,6 @@ export default class IntegrationsComponent implements OnInit {
     });
   }
 
-  saveWebhook(): void {
-    if (!this.webhookEndpoint().trim()) {
-      this.showToast('error', 'Endpoint URL is required.');
-      return;
-    }
-    this.modalLoading.set(true);
-    timer(600).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.modalLoading.set(false);
-      this.closeModal();
-      this.showToast('success', 'Webhook endpoint saved and verified.');
-    });
-  }
 
   testTelegramConnection(): void {
     if (!this.telegramBotToken().trim()) {

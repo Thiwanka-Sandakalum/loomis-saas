@@ -12,8 +12,8 @@ import { TelegramCallbackQuery } from './telegramCallbackQuery';
 
 
 export interface TelegramUpdate { 
-    updateId?: number;
+    update_id?: number;
     message?: TelegramMessage;
-    callbackQuery?: TelegramCallbackQuery;
+    callback_query?: TelegramCallbackQuery;
 }
 

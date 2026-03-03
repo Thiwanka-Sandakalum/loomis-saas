@@ -17,21 +17,24 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { CreateComplaintRequest } from '../model/create-complaint-request';
+import { CreateComplaintRequest } from '../model/createComplaintRequest';
 // @ts-ignore
-import { UpdateComplaintRequest } from '../model/update-complaint-request';
+import { UpdateComplaintRequest } from '../model/updateComplaintRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    ComplaintsServiceInterface
+} from './complaints.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ComplaintsService extends BaseService {
+export class ComplaintsService extends BaseService implements ComplaintsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

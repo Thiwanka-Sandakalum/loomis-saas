@@ -21,13 +21,16 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    DashboardServiceInterface
+} from './dashboard.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class DashboardService extends BaseService {
+export class DashboardService extends BaseService implements DashboardServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

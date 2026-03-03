@@ -17,25 +17,28 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { CreateSessionRequest } from '../model/create-session-request';
+import { CreateSessionRequest } from '../model/createSessionRequest';
 // @ts-ignore
-import { SessionListResponse } from '../model/session-list-response';
+import { SessionListResponse } from '../model/sessionListResponse';
 // @ts-ignore
-import { SessionResponse } from '../model/session-response';
+import { SessionResponse } from '../model/sessionResponse';
 // @ts-ignore
-import { UpdateSessionDataRequest } from '../model/update-session-data-request';
+import { UpdateSessionDataRequest } from '../model/updateSessionDataRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    SessionsServiceInterface
+} from './sessions.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class SessionsService extends BaseService {
+export class SessionsService extends BaseService implements SessionsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

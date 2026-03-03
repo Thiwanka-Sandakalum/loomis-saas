@@ -14,7 +14,7 @@ export interface TelegramChat {
     type?: string | null;
     title?: string | null;
     username?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
 }
 

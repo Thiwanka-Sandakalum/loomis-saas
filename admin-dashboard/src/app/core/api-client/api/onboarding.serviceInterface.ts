@@ -12,7 +12,10 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { AcceptInviteRequest } from '../model/models';
+import { CompanyProfileRequest } from '../model/models';
+import { OnboardingRatesRequest } from '../model/models';
 import { OnboardingResponse } from '../model/models';
+import { OnboardingStatusResponse } from '../model/models';
 import { SetupTenantRequest } from '../model/models';
 
 
@@ -35,9 +38,32 @@ export interface OnboardingServiceInterface {
     /**
      * 
      * 
+     * @endpoint put /api/onboarding/company-profile
+     * @param companyProfileRequest 
+     */
+    apiOnboardingCompanyProfilePut(companyProfileRequest?: CompanyProfileRequest, extraHttpRequestParams?: any): Observable<OnboardingStatusResponse>;
+
+    /**
+     * 
+     * 
+     * @endpoint post /api/onboarding/rates
+     * @param onboardingRatesRequest 
+     */
+    apiOnboardingRatesPost(onboardingRatesRequest?: OnboardingRatesRequest, extraHttpRequestParams?: any): Observable<OnboardingStatusResponse>;
+
+    /**
+     * 
+     * 
      * @endpoint post /api/onboarding/setup
      * @param setupTenantRequest 
      */
     apiOnboardingSetupPost(setupTenantRequest?: SetupTenantRequest, extraHttpRequestParams?: any): Observable<OnboardingResponse>;
+
+    /**
+     * 
+     * 
+     * @endpoint get /api/onboarding/status
+     */
+    apiOnboardingStatusGet(extraHttpRequestParams?: any): Observable<OnboardingStatusResponse>;
 
 }

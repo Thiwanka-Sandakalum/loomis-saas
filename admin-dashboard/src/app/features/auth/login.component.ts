@@ -33,31 +33,30 @@ import LoginButtonComponent from './login-button.component';
                     <!-- Hero Content -->
                     <div class="max-w-lg">
                         <h2 class="text-4xl font-bold leading-tight mb-6">
-                            Streamline Your Courier Operations
+                            AI-Automated Courier Service Platform
                         </h2>
                         <p class="text-xl text-white/90 mb-8 leading-relaxed">
-                            Manage shipments, track deliveries, handle customer inquiries, and optimize your courier business with our comprehensive admin platform.
+                            Experience a fully AI-automated courier service that streamlines customer service and internal operations. Our platform manages shipments, automates customer inquiries, and optimizes every aspect of your courier business with intelligent automation.
                         </p>
-                        
                         <!-- Features -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                                    <span class="material-symbols-outlined text-sm">package_2</span>
+                                    <span class="material-symbols-outlined text-sm">smart_toy</span>
                                 </div>
-                                <span class="text-white/90">Real-time shipment tracking</span>
+                                <span class="text-white/90">AI-automated customer service</span>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                                    <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                                    <span class="material-symbols-outlined text-sm">settings</span>
                                 </div>
-                                <span class="text-white/90">AI-powered customer support</span>
+                                <span class="text-white/90">Automated internal operations</span>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                                    <span class="material-symbols-outlined text-sm">analytics</span>
+                                    <span class="material-symbols-outlined text-sm">local_shipping</span>
                                 </div>
-                                <span class="text-white/90">Comprehensive analytics dashboard</span>
+                                <span class="text-white/90">End-to-end shipment automation</span>
                             </div>
                         </div>
                     </div>
@@ -84,14 +83,11 @@ import LoginButtonComponent from './login-button.component';
                 } @else {
                     <!-- Login Form -->
                     <div class="w-full max-w-md space-y-8">
-                        <!-- Header -->
-                        <div class="text-center lg:text-left">
-                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                                Welcome back
+                        <!-- Centered Sign In Title -->
+                        <div class="flex flex-col items-center justify-center mb-8">
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2 text-center">
+                                Sign in to Admin Dashboard
                             </h2>
-                            <p class="text-slate-600 dark:text-slate-400">
-                                Sign in to your Loomis Courier admin account
-                            </p>
                         </div>
                         
                         <!-- Error State -->
@@ -111,20 +107,10 @@ import LoginButtonComponent from './login-button.component';
                             </div>
                         }
                         
-                        <!-- Login Card -->
-                        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
-                            <!-- Security Badge -->
-                            <div class="flex items-center justify-center gap-2 mb-6 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                                <span class="material-symbols-outlined text-green-600 text-lg">shield</span>
-                                <span class="text-sm font-medium text-green-800 dark:text-green-200">
-                                    Secure authentication powered by Auth0
-                                </span>
-                            </div>
-                            
-                            <!-- Login Button -->
-                            <div class="space-y-4">
+                        <!-- Login Card (No Security Badge, No Alt Auth) -->
+                        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 flex flex-col items-center">
+                            <div class="space-y-4 w-full">
                                 <app-login-button />
-                                
                                 <!-- Additional Info -->
                                 <div class="text-center pt-4">
                                     <p class="text-xs text-slate-500 dark:text-slate-400">

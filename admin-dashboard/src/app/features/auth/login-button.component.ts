@@ -13,35 +13,6 @@ import { Auth0Service } from '../../core/auth/sso-auth.service';
             Sign in to Admin Dashboard
         </button>
         
-        <!-- Alternative Authentication Methods (Future) -->
-        <div class="mt-4 text-center">
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                Or continue with
-            </p>
-            <div class="flex justify-center gap-3">
-                <button 
-                    disabled
-                    class="flex items-center justify-center h-11 w-11 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                    title="Coming soon"
-                >
-                    <span class="material-symbols-outlined text-lg">fingerprint</span>
-                </button>
-                <button 
-                    disabled
-                    class="flex items-center justify-center h-11 w-11 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                    title="Coming soon"
-                >
-                    <span class="material-symbols-outlined text-lg">key</span>
-                </button>
-                <button 
-                    disabled
-                    class="flex items-center justify-center h-11 w-11 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                    title="Coming soon"
-                >
-                    <span class="material-symbols-outlined text-lg">smartphone</span>
-                </button>
-            </div>
-        </div>
     `
 })
 export default class LoginButtonComponent {

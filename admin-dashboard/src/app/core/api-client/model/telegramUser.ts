@@ -11,10 +11,10 @@
 
 export interface TelegramUser { 
     id?: number;
-    isBot?: boolean;
-    firstName?: string | null;
-    lastName?: string | null;
+    is_bot?: boolean;
+    first_name?: string | null;
+    last_name?: string | null;
     username?: string | null;
-    languageCode?: string | null;
+    language_code?: string | null;
 }
 

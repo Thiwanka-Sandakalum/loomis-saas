@@ -17,25 +17,28 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { SendTelegramMessageRequest } from '../model/send-telegram-message-request';
+import { SendTelegramMessageRequest } from '../model/sendTelegramMessageRequest';
 // @ts-ignore
-import { TelegramChatListResponse } from '../model/telegram-chat-list-response';
+import { TelegramChatListResponse } from '../model/telegramChatListResponse';
 // @ts-ignore
-import { TelegramMessageListResponse } from '../model/telegram-message-list-response';
+import { TelegramMessageListResponse } from '../model/telegramMessageListResponse';
 // @ts-ignore
-import { TelegramUpdate } from '../model/telegram-update';
+import { TelegramUpdate } from '../model/telegramUpdate';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    TelegramServiceInterface
+} from './telegram.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class TelegramService extends BaseService {
+export class TelegramService extends BaseService implements TelegramServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
