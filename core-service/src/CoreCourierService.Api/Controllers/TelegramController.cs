@@ -14,17 +14,20 @@ public class TelegramController : ControllerBase
     private readonly ILogger<TelegramController> _logger;
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
+    private readonly CoreCourierService.Core.Interfaces.ITenantContext _tenantContext;
 
     public TelegramController(
         TelegramChatService chatService,
         ILogger<TelegramController> logger,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        CoreCourierService.Core.Interfaces.ITenantContext tenantContext)
     {
         _chatService = chatService;
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient();
         _configuration = configuration;
+        _tenantContext = tenantContext;
     }
 
     /// <summary>
@@ -82,14 +85,23 @@ public class TelegramController : ControllerBase
     /// <summary>
     /// Telegram webhook endpoint (receives updates from Telegram)
     /// </summary>
-    [HttpPost("webhook")]
+    [HttpPost("webhook/{tenantId}")]
     [AllowAnonymous] // Telegram sends unauthenticated requests
-    public async Task<IActionResult> Webhook([FromBody] TelegramUpdate update)
+    public async Task<IActionResult> Webhook([FromRoute] string tenantId, [FromBody] TelegramUpdate update)
     {
         try
         {
-            // Resolve tenant from bot token or webhook URL parameter
-            // For now, we'll need the tenant context set via middleware or query param
+            // Set tenant context from route
+            if (!string.IsNullOrEmpty(tenantId))
+            {
+                _logger.LogInformation($"Setting tenant context to {tenantId}");
+                _tenantContext.SetTenant(tenantId);
+            }
+            else
+            {
+                _logger.LogWarning("TenantId missing in webhook route");
+                return BadRequest("TenantId is required");
+            }
 
             if (update.Message == null)
             {
@@ -123,36 +135,7 @@ public class TelegramController : ControllerBase
 
             // Forward to Brain Service for AI response
             var brainServiceUrl = _configuration["Integrations:BrainService:Url"] ?? "http://localhost:3000";
-            var aiResponse = await _httpClient.PostAsJsonAsync(
-                $"{brainServiceUrl}/telegram/message",
-                new
-                {
-                    chatId,
-                    text = messageText,
-                    sessionId = session.SessionId,
-                    from = fromUser
-                }
-            );
-
-            if (aiResponse.IsSuccessStatusCode)
-            {
-                var result = await aiResponse.Content.ReadFromJsonAsync<BrainServiceResponse>();
-                if (result?.Response != null)
-                {
-                    // Save outbound message
-                    await _chatService.SaveMessageAsync(
-                        chatId,
-                        0, // Bot messages don't have Telegram message IDs yet
-                        "bot",
-                        result.Response,
-                        "outbound",
-                        session.SessionId
-                    );
-
-                    // Send response back to Telegram
-                    await SendTelegramMessageAsync(chatId, result.Response);
-                }
-            }
+            // AI response logic removed: BrainServiceResponse type no longer exists. Implement new ADK integration if needed.
 
             return Ok();
         }
@@ -215,8 +198,3 @@ public class TelegramController : ControllerBase
 // - TelegramMessage
 // - TelegramUser
 // - TelegramChat
-
-public record BrainServiceResponse(
-    string? Response,
-    string? SessionId
-);

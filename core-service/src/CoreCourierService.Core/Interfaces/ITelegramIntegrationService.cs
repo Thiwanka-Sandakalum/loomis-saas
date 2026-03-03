@@ -15,7 +15,7 @@ public interface ITelegramIntegrationService
 public interface ITelegramWebhookHandler
 {
     Task HandleUpdateAsync(string tenantId, object update);
-    Task HandleCommandAsync(TenantIntegration integration, object message);
-    Task ForwardToBrainServiceAsync(TenantIntegration integration, object message);
-    Task SendMessageAsync(string botToken, string chatId, string text, string? parseMode = "Markdown");
+    Task HandleCommandAsync(TenantIntegration integration, object message, string tenantId);
+    Task ForwardToBrainServiceAsync(TenantIntegration integration, object message, string tenantId);
+    Task SendMessageAsync(string botToken, string chatId, string text, string tenantId, string? parseMode = "Markdown");
 }

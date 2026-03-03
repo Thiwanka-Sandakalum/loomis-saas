@@ -239,11 +239,38 @@ public class IntegrationsController : ControllerBase
     [HttpPost("telegram/webhook/{tenantId}")]
     [AllowAnonymous]
     public async Task<IActionResult> HandleTelegramWebhook(
-        string tenantId,
-        [FromBody] TelegramUpdate update)
+        string tenantId)
     {
         try
         {
+
+            // Read and log the raw request body for debugging
+            string rawBody = string.Empty;
+            Request.EnableBuffering();
+            using (var reader = new StreamReader(Request.Body, System.Text.Encoding.UTF8, leaveOpen: true))
+            {
+                rawBody = await reader.ReadToEndAsync();
+                Request.Body.Position = 0;
+            }
+            _logger.LogInformation("Raw Telegram webhook body: {RawBody}", rawBody);
+
+            TelegramUpdate? update = null;
+            try
+            {
+                update = System.Text.Json.JsonSerializer.Deserialize<TelegramUpdate>(rawBody);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize TelegramUpdate from webhook body");
+                return BadRequest("Invalid Telegram update payload");
+            }
+
+            if (update == null)
+            {
+                _logger.LogWarning("TelegramUpdate is null after deserialization");
+                return BadRequest("Empty Telegram update");
+            }
+
             _logger.LogInformation(
                 "Received Telegram webhook for tenant {TenantId}, update {UpdateId}",
                 tenantId,
@@ -255,6 +282,7 @@ public class IntegrationsController : ControllerBase
                 try
                 {
                     await _webhookHandler.HandleUpdateAsync(tenantId, update);
+                    // If you call HandleCommandAsync, ForwardToBrainServiceAsync, or SendMessageAsync elsewhere, ensure tenantId is passed as required by the new interface.
                 }
                 catch (Exception ex)
                 {

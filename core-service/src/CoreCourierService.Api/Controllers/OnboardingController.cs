@@ -249,22 +249,8 @@ public class OnboardingController : ControllerBase
             return NotFound(new { error = "Tenant not found" });
         }
 
-        var enabledServices = tenant.EnabledServices ?? new List<string>();
-        var missingServices = enabledServices
-            .Where(s => request.Rates.All(r => !string.Equals(r.ServiceType, s, StringComparison.OrdinalIgnoreCase)))
-            .ToList();
 
-        if (missingServices.Count > 0)
-        {
-            return BadRequest(new
-            {
-                error = new
-                {
-                    code = "MISSING_RATES",
-                    details = missingServices.Select(s => $"Missing rate for service type: {s}").ToList()
-                }
-            });
-        }
+        // Allow fully dynamic service types: do not require rates for all enabledServices
 
         _tenantContext.SetTenant(tenantUser.TenantId);
 

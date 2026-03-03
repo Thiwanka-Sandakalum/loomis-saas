@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CoreCourierService.Api.DTOs;
 
 public record TelegramChatResponse(
@@ -35,6 +37,6 @@ public record TelegramMessageListResponse(
 );
 
 public record SendTelegramMessageRequest(
-    string ChatId,
-    string Text
+    [property: JsonPropertyName("chat_id")] string ChatId,
+    [property: JsonPropertyName("text")] string Text
 );

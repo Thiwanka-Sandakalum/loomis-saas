@@ -1,4 +1,83 @@
+using System.Text.Json.Serialization;
+
 namespace CoreCourierService.Api.DTOs;
+
+public class AdkRunRequest
+{
+    [JsonPropertyName("appName")]
+    public string AppName { get; set; } = string.Empty;
+
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = string.Empty;
+
+    [JsonPropertyName("sessionId")]
+    public string SessionId { get; set; } = string.Empty;
+
+    [JsonPropertyName("newMessage")]
+    public AdkNewMessage NewMessage { get; set; } = new();
+}
+
+public class AdkNewMessage
+{
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = "user";
+
+    [JsonPropertyName("parts")]
+    public List<AdkMessagePart> Parts { get; set; } = new();
+}
+
+public class AdkMessagePart
+{
+    [JsonPropertyName("text")]
+    public string Text { get; set; } = string.Empty;
+
+    [JsonPropertyName("functionCall")]
+    public AdkFunctionCall? FunctionCall { get; set; }
+
+    [JsonPropertyName("functionResponse")]
+    public AdkFunctionResponse? FunctionResponse { get; set; }
+}
+
+public class AdkFunctionCall
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("args")]
+    public Dictionary<string, object>? Args { get; set; }
+
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+}
+
+public class AdkFunctionResponse
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("response")]
+    public object? Response { get; set; }
+}
+
+public class AdkEvent
+{
+    [JsonPropertyName("content")]
+    public AdkEventContent? Content { get; set; }
+
+    [JsonPropertyName("errorMessage")]
+    public string? ErrorMessage { get; set; }
+}
+
+public class AdkEventContent
+{
+    [JsonPropertyName("parts")]
+    public List<AdkMessagePart>? Parts { get; set; }
+}
+
+
 
 // ==================== SETUP & CONFIGURATION ====================
 
@@ -34,39 +113,44 @@ public record TelegramStatusResponse(
 
 // ==================== TELEGRAM WEBHOOK MODELS ====================
 
+
 public record TelegramUpdate(
-    long UpdateId,
-    TelegramMessage? Message = null,
-    TelegramCallbackQuery? CallbackQuery = null);
+    [property: JsonPropertyName("update_id")] long UpdateId,
+    [property: JsonPropertyName("message")] TelegramMessage? Message = null,
+    [property: JsonPropertyName("callback_query")] TelegramCallbackQuery? CallbackQuery = null);
+
 
 public record TelegramMessage(
-    long MessageId,
-    TelegramUser From,
-    TelegramChat Chat,
-    string Text,
-    long Date);
+    [property: JsonPropertyName("message_id")] long MessageId,
+    [property: JsonPropertyName("from")] TelegramUser From,
+    [property: JsonPropertyName("chat")] TelegramChat Chat,
+    [property: JsonPropertyName("text")] string Text,
+    [property: JsonPropertyName("date")] long Date);
+
 
 public record TelegramUser(
-    long Id,
-    bool IsBot,
-    string FirstName,
-    string? LastName = null,
-    string? Username = null,
-    string? LanguageCode = null);
+    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("is_bot")] bool IsBot,
+    [property: JsonPropertyName("first_name")] string FirstName,
+    [property: JsonPropertyName("last_name")] string? LastName = null,
+    [property: JsonPropertyName("username")] string? Username = null,
+    [property: JsonPropertyName("language_code")] string? LanguageCode = null);
+
 
 public record TelegramChat(
-    long Id,
-    string Type,
-    string? Title = null,
-    string? Username = null,
-    string? FirstName = null,
-    string? LastName = null);
+    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("title")] string? Title = null,
+    [property: JsonPropertyName("username")] string? Username = null,
+    [property: JsonPropertyName("first_name")] string? FirstName = null,
+    [property: JsonPropertyName("last_name")] string? LastName = null);
+
 
 public record TelegramCallbackQuery(
-    string Id,
-    TelegramUser From,
-    TelegramMessage? Message,
-    string Data);
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("from")] TelegramUser From,
+    [property: JsonPropertyName("message")] TelegramMessage? Message,
+    [property: JsonPropertyName("data")] string Data);
 
 // ==================== TELEGRAM API RESPONSES ====================
 
@@ -100,21 +184,3 @@ public record TelegramInlineKeyboardButton(
     string? CallbackData = null);
 
 // ==================== BRAIN SERVICE INTEGRATION ====================
-
-public record BrainServiceRequest(
-    string TenantId,
-    string Platform,
-    string UserId,
-    string Message,
-    BrainServiceMetadata Metadata);
-
-public record BrainServiceMetadata(
-    long ChatId,
-    string? Username,
-    string? FirstName);
-
-public record BrainServiceResponse(
-    bool Success,
-    string Message,
-    string? TrackingNumber = null,
-    Dictionary<string, object>? Data = null);

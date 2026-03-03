@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using TelegramMessageDto = CoreCourierService.Api.DTOs.TelegramMessage;
 using TelegramMessageEntity = CoreCourierService.Core.Entities.TelegramMessage;
+using TelegramChatEntity = CoreCourierService.Core.Entities.TelegramChat;
 
 namespace CoreCourierService.Api.Services;
 
@@ -14,6 +15,8 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
     private readonly ITenantIntegrationRepository _repository;
     private readonly IShipmentRepository _shipmentRepository;
     private readonly IRateRepository _rateRepository;
+    private readonly ITelegramMessageRepository _messageRepository;
+    private readonly ITelegramChatRepository _chatRepository;
     private readonly ILogger<TelegramWebhookHandler> _logger;
     private readonly HttpClient _httpClient;
     private readonly string? _brainServiceUrl;
@@ -22,6 +25,8 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
         ITenantIntegrationRepository repository,
         IShipmentRepository shipmentRepository,
         IRateRepository rateRepository,
+        ITelegramMessageRepository messageRepository,
+        ITelegramChatRepository chatRepository,
         ILogger<TelegramWebhookHandler> logger,
         HttpClient httpClient,
         IConfiguration configuration)
@@ -29,6 +34,8 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
         _repository = repository;
         _shipmentRepository = shipmentRepository;
         _rateRepository = rateRepository;
+        _messageRepository = messageRepository;
+        _chatRepository = chatRepository;
         _logger = logger;
         _httpClient = httpClient;
         _brainServiceUrl = configuration["Integrations:BrainService:Url"];
@@ -65,20 +72,56 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
             return;
         }
 
+        // Only create chat if it does not exist, otherwise update lastMessageAt
+        var existingChat = await _chatRepository.GetByChatIdAsync(message.Chat.Id.ToString(), tenantId);
+        if (existingChat == null)
+        {
+            await _chatRepository.CreateAsync(new TelegramChatEntity
+            {
+                TenantId = tenantId,
+                ChatId = message.Chat.Id.ToString(),
+                UserName = message.From?.Username,
+                FirstName = message.From?.FirstName,
+                LastName = message.From?.LastName,
+                CreatedAt = DateTime.UtcNow,
+                LastMessageAt = DateTime.UtcNow,
+                IsActive = true
+            });
+            _logger.LogInformation("[TelegramWebhook] Created new chat for chatId={ChatId} tenantId={TenantId}", message.Chat.Id, tenantId);
+        }
+        else
+        {
+            existingChat.LastMessageAt = DateTime.UtcNow;
+            await _chatRepository.UpdateAsync(existingChat.ChatId, existingChat);
+            _logger.LogInformation("[TelegramWebhook] Updated lastMessageAt for chatId={ChatId} tenantId={TenantId}", message.Chat.Id, tenantId);
+        }
+
         _logger.LogInformation(
             "Processing Telegram message from user {UserId} for tenant {TenantId}",
-            message.From.Id,
+            message.From?.Id ?? 0,
             tenantId);
 
-        // Check if it's a command
-        if (message.Text.StartsWith("/"))
+        // Save inbound message
+        await _messageRepository.CreateAsync(new TelegramMessageEntity
         {
-            await HandleCommandAsync(integration, message);
+            TenantId = tenantId,
+            ChatId = message.Chat.Id.ToString(),
+            MessageId = message.MessageId,
+            FromUser = message.From?.Username ?? message.From?.FirstName ?? message.From?.Id.ToString() ?? "Unknown",
+            Text = message.Text ?? string.Empty,
+            Direction = "inbound",
+            Timestamp = DateTime.UtcNow
+        });
+
+        // Check if it's a command
+        if (!string.IsNullOrEmpty(message.Text) && message.Text.StartsWith("/"))
+        {
+            await HandleCommandAsync(integration, message, tenantId);
         }
         else if (config.ForwardToBrain && !string.IsNullOrEmpty(_brainServiceUrl))
         {
             // Forward natural language messages to AI Brain
-            await ForwardToBrainServiceAsync(integration, message);
+            await ForwardToBrainServiceAsync(integration, message, tenantId);
         }
         else if (config.AutoReplyEnabled)
         {
@@ -86,11 +129,12 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
             await SendMessageAsync(
                 config.BotToken,
                 message.Chat.Id.ToString(),
-                "Thank you for your message. Our team will get back to you shortly.");
+                "Thank you for your message. Our team will get back to you shortly.",
+                tenantId);
         }
     }
 
-    public async Task HandleCommandAsync(TenantIntegration integration, object messageObj)
+    public async Task HandleCommandAsync(TenantIntegration integration, object messageObj, string tenantId)
     {
         if (messageObj is not TelegramMessageDto message)
         {
@@ -113,7 +157,8 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
             await SendMessageAsync(
                 config.BotToken,
                 message.Chat.Id.ToString(),
-                $"Sorry, the command `{command}` is not available.");
+                $"Sorry, the command `{command}` is not available.",
+                tenantId);
             return;
         }
 
@@ -128,10 +173,10 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
             _ => "Unknown command. Send /help for available commands."
         };
 
-        await SendMessageAsync(config.BotToken, message.Chat.Id.ToString(), response);
+        await SendMessageAsync(config.BotToken, message.Chat.Id.ToString(), response, tenantId);
     }
 
-    public async Task ForwardToBrainServiceAsync(TenantIntegration integration, object messageObj)
+    public async Task ForwardToBrainServiceAsync(TenantIntegration integration, object messageObj, string tenantId)
     {
         if (messageObj is not TelegramMessageDto message)
         {
@@ -150,68 +195,177 @@ public class TelegramWebhookHandler : ITelegramWebhookHandler
             return;
         }
 
+        // Prepare ADK session info
+        var appName = "agent"; // Must match ADK agent name
+                               // var userId = "sandbox_user"; // Use a static or mapped user for now (update as needed)
+                               // var sessionId = $"sandbox_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+        var userId = $"telegram_{message.From.Id}";
+        var sessionId = message.Chat.Id.ToString();
+        // Step 1: Create session (ignore error if already exists)
         try
         {
-            var payload = new BrainServiceRequest(
-                TenantId: integration.TenantId,
-                Platform: "telegram",
-                UserId: message.From.Id.ToString(),
-                Message: message.Text,
-                Metadata: new BrainServiceMetadata(
-                    ChatId: message.Chat.Id,
-                    Username: message.From.Username,
-                    FirstName: message.From.FirstName
-                )
-            );
-
-            _logger.LogInformation(
-                "Forwarding message to Brain service for tenant {TenantId}",
-                integration.TenantId);
-
-            var response = await _httpClient.PostAsJsonAsync(
-                $"{_brainServiceUrl}/api/chat/process",
-                payload);
-
-            if (response.IsSuccessStatusCode)
+            var sessionUrl = $"{_brainServiceUrl.TrimEnd('/')}/apps/{appName}/users/{userId}/sessions/{sessionId}";
+            var sessionResponse = await _httpClient.PostAsJsonAsync(sessionUrl, new { });
+            if (sessionResponse.StatusCode == System.Net.HttpStatusCode.Conflict ||
+                sessionResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                var result = await response.Content.ReadFromJsonAsync<BrainServiceResponse>();
-
-                if (result != null)
-                {
-                    await SendMessageAsync(config.BotToken, message.Chat.Id.ToString(), result.Message);
-
-                    _logger.LogInformation(
-                        "Successfully processed message via Brain service for tenant {TenantId}",
-                        integration.TenantId);
-                }
+                _logger.LogInformation("Session already exists or BadRequest for user {UserId} and session {SessionId}, continuing to /run", userId, sessionId);
+                // This is not an error, continue to /run
             }
-            else
+            else if (!sessionResponse.IsSuccessStatusCode)
             {
-                _logger.LogError(
-                    "Brain service returned error status {StatusCode}",
-                    response.StatusCode);
-
+                _logger.LogError("Failed to create session with brain-service. Status: {StatusCode}", sessionResponse.StatusCode);
                 await SendMessageAsync(
                     config.BotToken,
                     message.Chat.Id.ToString(),
-                    "I'm having trouble processing your request right now. Please try again later or use /help for available commands.");
+                    "I'm having trouble creating a session with our AI service. Please try again later.",
+                    tenantId);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating session with brain-service");
+            await SendMessageAsync(
+                config.BotToken,
+                message.Chat.Id.ToString(),
+                "Sorry, I encountered an error creating a session with our AI service. Please try again or contact support.",
+                tenantId);
+            return;
+        }
+
+        // Step 2: Call /run
+        var adkRequest = new AdkRunRequest
+        {
+            AppName = appName,
+            UserId = userId,
+            SessionId = sessionId,
+            NewMessage = new AdkNewMessage
+            {
+                Role = "user",
+                Parts = new List<AdkMessagePart> { new AdkMessagePart { Text = message.Text } }
+            }
+        };
+
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+                $"{_brainServiceUrl.TrimEnd('/')}/run",
+                adkRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Brain service returned error status {StatusCode}", response.StatusCode);
+                await SendMessageAsync(
+                    config.BotToken,
+                    message.Chat.Id.ToString(),
+                    "I'm having trouble processing your request right now. Please try again later or use /help for available commands.",
+                    tenantId);
+                return;
+            }
+
+            // Parse ADK events array and extract reply, functionCall, functionResponse, or errorMessage
+            var events = await response.Content.ReadFromJsonAsync<List<AdkEvent>>();
+            string? reply = null;
+            string? error = null;
+
+            if (events != null)
+            {
+                // 1. Prefer plain text reply
+                reply = events.SelectMany(e => e.Content?.Parts ?? new List<AdkMessagePart>())
+                    .Select(p => p.Text)
+                    .FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
+
+                // 2. If no text, check for functionResponse
+                if (reply == null)
+                {
+                    reply = events.SelectMany(e => e.Content?.Parts ?? new List<AdkMessagePart>())
+                        .Select(p => p.FunctionResponse?.Response?.ToString())
+                        .FirstOrDefault(r => !string.IsNullOrWhiteSpace(r));
+                }
+
+                // 3. If no text or functionResponse, check for errorMessage
+                if (reply == null)
+                {
+                    error = events.FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))?.ErrorMessage;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(reply))
+            {
+                await SendMessageAsync(config.BotToken, message.Chat.Id.ToString(), reply, tenantId);
+                _logger.LogInformation("Successfully processed message via Brain service for tenant {TenantId}", integration.TenantId);
+            }
+            else if (!string.IsNullOrWhiteSpace(error))
+            {
+                _logger.LogError("Brain service error: {Error}", error);
+                await SendMessageAsync(
+                    config.BotToken,
+                    message.Chat.Id.ToString(),
+                    $"AI error: {error}",
+                    tenantId);
+            }
+            else
+            {
+                _logger.LogError("No valid reply found in Brain service response");
+                await SendMessageAsync(
+                    config.BotToken,
+                    message.Chat.Id.ToString(),
+                    "I'm having trouble processing your request right now. Please try again later or use /help for available commands.",
+                    tenantId);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error forwarding message to Brain service");
-
             await SendMessageAsync(
                 config.BotToken,
                 message.Chat.Id.ToString(),
-                "Sorry, I encountered an error processing your request. Please try again or contact support.");
+                "Sorry, I encountered an error processing your request. Please try again or contact support.",
+                tenantId);
         }
     }
 
-    public async Task SendMessageAsync(string botToken, string chatId, string text, string? parseMode = "Markdown")
+    public async Task SendMessageAsync(string botToken, string chatId, string text, string tenantId, string? parseMode = "Markdown")
     {
         try
         {
+            // Always use provided tenantId
+            await _messageRepository.CreateAsync(new TelegramMessageEntity
+            {
+                TenantId = tenantId,
+                ChatId = chatId,
+                MessageId = 0, // Telegram will assign its own ID
+                FromUser = "bot",
+                Text = text,
+                Direction = "outbound",
+                Timestamp = DateTime.UtcNow
+            });
+
+            // Only create chat if it does not exist, otherwise update lastMessageAt
+            var existingChat = await _chatRepository.GetByChatIdAsync(chatId, tenantId);
+            if (existingChat == null)
+            {
+                await _chatRepository.CreateAsync(new TelegramChatEntity
+                {
+                    TenantId = tenantId,
+                    ChatId = chatId,
+                    UserName = null, // Not available for outbound
+                    FirstName = null,
+                    LastName = null,
+                    CreatedAt = DateTime.UtcNow,
+                    LastMessageAt = DateTime.UtcNow,
+                    IsActive = true
+                });
+                _logger.LogInformation("[TelegramWebhook] Created new chat (outbound) for chatId={ChatId} tenantId={TenantId}", chatId, tenantId);
+            }
+            else
+            {
+                existingChat.LastMessageAt = DateTime.UtcNow;
+                await _chatRepository.UpdateAsync(existingChat.ChatId, existingChat);
+                _logger.LogInformation("[TelegramWebhook] Updated lastMessageAt (outbound) for chatId={ChatId} tenantId={TenantId}", chatId, tenantId);
+            }
+
             var url = $"https://api.telegram.org/bot{botToken}/sendMessage";
 
             var payload = new SendTelegramMessageRequest(

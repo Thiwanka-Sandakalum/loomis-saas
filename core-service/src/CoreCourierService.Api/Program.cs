@@ -8,6 +8,23 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register MongoDB class maps for IntegrationConfig and its subclasses
+MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CoreCourierService.Core.Entities.IntegrationConfig>(cm =>
+{
+    cm.AutoMap();
+    cm.SetIsRootClass(true);
+});
+MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CoreCourierService.Core.Entities.TelegramConfig>(cm =>
+{
+    cm.AutoMap();
+    cm.SetDiscriminator("TelegramConfig");
+});
+MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CoreCourierService.Core.Entities.WhatsAppConfig>(cm =>
+{
+    cm.AutoMap();
+    cm.SetDiscriminator("WhatsAppConfig");
+});
+
 // Configure MongoDB settings
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
@@ -86,7 +103,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-
 // Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -97,9 +113,20 @@ else
     app.UseExceptionHandler("/Home/Error");
 }
 
+// Add global exception middleware for structured error responses
+app.UseMiddleware<CoreCourierService.Api.Middleware.GlobalExceptionMiddleware>();
+
 app.UseStaticFiles();
 
 app.UseCors();
+
+// Enable Swagger middleware
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreCourierService API V1");
+    c.RoutePrefix = "swagger"; // Serve at /swagger
+});
 
 // Enable authentication middleware
 app.UseAuthentication();
@@ -115,7 +142,6 @@ app.UseMvc(routes =>
         name: "default",
         template: "{controller=Home}/{action=Index}/{id?}");
 });
-
 
 // Listen on the port defined by the PORT environment variable (Cloud Run requirement)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
