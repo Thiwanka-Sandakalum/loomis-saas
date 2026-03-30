@@ -6,6 +6,7 @@ export interface AppError {
     message: string;
     code?: string;
     statusCode?: number;
+    correlationId?: string;
     details?: any;
     timestamp: Date;
 }
@@ -41,10 +42,14 @@ export class ErrorHandlerService {
     }
 
     private handleHttpError(error: HttpErrorResponse): AppError {
+        // Extract backend correlation ID if present
+        const backendErrorId = error.error?.errorId;
+
         const baseError: AppError = {
             message: 'An error occurred',
             statusCode: error.status,
             timestamp: new Date(),
+            ...(backendErrorId && { correlationId: backendErrorId }),
         };
 
         switch (error.status) {

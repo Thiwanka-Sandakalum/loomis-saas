@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+
+# Angular
+.angular/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+jenkins/
+
+# Testing
+coverage/
+test-results/
+.nyc_output/
+
+# Build artifacts
+build/
+dist/
+*.tar.gz
+
+# Documentation
+docs/
+README.md
+
+# Certificates
+*.pem
+*.key
+*.crt
+
+# Dependencies cache
+.cache/

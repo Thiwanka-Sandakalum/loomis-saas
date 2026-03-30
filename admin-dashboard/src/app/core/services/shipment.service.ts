@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, delay, map } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 import { ShipmentsService as ShipmentsApiService } from '../api-client/api/shipments.service';
 import { ShipmentResponse, ShipmentResponsePagedResponse } from '../api-client/model/models';
 import {
@@ -24,9 +24,7 @@ export class ShipmentService {
 
         // TODO: Add search, serviceType, dateFrom, dateTo parameters when API supports them
         return this.shipmentsApi.apiShipmentsGet(page, pageSize, status).pipe(
-            map((response) => this.mapShipmentPage(response, page, pageSize)),
-            catchError(() => of(this.getMockPaginatedShipments(filters))),
-            delay(200)
+            map((response) => this.mapShipmentPage(response, page, pageSize))
         );
     }
 
@@ -36,17 +34,21 @@ export class ShipmentService {
 
     getShipmentByTracking(trackingNumber: string): Observable<Shipment> {
         return this.shipmentsApi.apiShipmentsTrackingTrackingNumberGet(trackingNumber).pipe(
-            map((response) => this.mapShipmentResponse(response) ?? this.getMockShipment(trackingNumber)),
-            catchError(() => of(this.getMockShipment(trackingNumber))),
-            delay(200)
+            map((response) => {
+                const shipment = this.mapShipmentResponse(response);
+                if (!shipment) throw new Error(`Shipment ${trackingNumber} not found`);
+                return shipment;
+            })
         );
     }
 
     createShipment(data: CreateShipmentRequest): Observable<Shipment> {
         return this.shipmentsApi.apiShipmentsPost(data).pipe(
-            map((response) => this.mapShipmentResponse(response) ?? this.getMockShipment('new')),
-            catchError(() => of(this.getMockShipment('new'))),
-            delay(400)
+            map((response) => {
+                const shipment = this.mapShipmentResponse(response);
+                if (!shipment) throw new Error('Failed to create shipment');
+                return shipment;
+            })
         );
     }
 
@@ -55,9 +57,11 @@ export class ShipmentService {
             shipmentId,
             { status, location, notes }
         ).pipe(
-            map((response) => this.mapShipmentResponse(response) ?? this.getMockShipment(shipmentId)),
-            catchError(() => of(this.getMockShipment(shipmentId))),
-            delay(300)
+            map((response) => {
+                const shipment = this.mapShipmentResponse(response);
+                if (!shipment) throw new Error('Failed to update shipment status');
+                return shipment;
+            })
         );
     }
 
@@ -156,70 +160,4 @@ export class ShipmentService {
         return 'pending';
     }
 
-    // Mock data fallback
-    private getMockPaginatedShipments(filters: ShipmentFilters): PaginatedResponse<Shipment> {
-        const page = filters.page ?? 1;
-        const pageSize = filters.pageSize ?? 10;
-        const startIndex = (page - 1) * pageSize;
-        const data = Array.from({ length: pageSize }, (_, index) =>
-            this.getMockShipment(`mock-${startIndex + index + 1}`)
-        );
-
-        return {
-            data,
-            total: pageSize * 5,
-            page,
-            pageSize
-        };
-    }
-
-    private getMockShipment(id: string): Shipment {
-        return {
-            id: id,
-            trackingNumber: `LOOM-${Math.floor(Math.random() * 100000)}`,
-            origin: {
-                street: '100 Market St',
-                city: 'San Francisco',
-                state: 'CA',
-                postalCode: '94103',
-                country: 'USA'
-            },
-            destination: {
-                street: '500 5th Ave',
-                city: 'New York',
-                state: 'NY',
-                postalCode: '10018',
-                country: 'USA'
-            },
-            serviceType: 'Express',
-            weight: 2.5,
-            cost: 25.00,
-            status: 'in-transit',
-            eta: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-            customerName: 'John Doe',
-            customerPhone: '555-0100',
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-            updatedAt: new Date(),
-            timeline: [
-                {
-                    status: 'pending',
-                    location: 'San Francisco, CA',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-                    notes: 'Shipment created'
-                },
-                {
-                    status: 'picked-up',
-                    location: 'San Francisco, CA',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20),
-                    notes: 'Package picked up'
-                },
-                {
-                    status: 'in-transit',
-                    location: 'Denver, CO',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12),
-                    notes: 'In transit to destination'
-                }
-            ]
-        };
-    }
 }
