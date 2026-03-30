@@ -1,0 +1,136 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/certificate-arn: ${ACM_CERTIFICATE_ARN}
+    alb.ingress.kubernetes.io/success-codes: 200,301,302
+    alb.ingress.kubernetes.io/health-check-path: /health
+    alb.ingress.kubernetes.io/health-check-interval-seconds: "30"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
+    alb.ingress.kubernetes.io/tags: "Environment=production,Project=loomis"
+spec:
+  rules:
+    - host: "loomis.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-dashboard
+                port:
+                  number: 80
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: core-service
+                port:
+                  number: 5000
+          - path: /brain-api/
+            pathType: Prefix
+            backend:
+              service:
+                name: brain-service
+                port:
+                  number: 8000
+    - host: "api.loomis.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: core-service
+                port:
+                  number: 5000
+    - host: "brain.loomis.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: brain-service
+                port:
+                  number: 8000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: production-network-policy
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: production
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: production
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+    - to:
+        - podSelector: {}
+          ports:
+            - protocol: TCP
+              port: 53
+            - protocol: UDP
+              port: 53
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: core-service-pdb
+  namespace: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: core-service
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: brain-service-pdb
+  namespace: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: brain-service
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: admin-dashboard-pdb
+  namespace: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: admin-dashboard

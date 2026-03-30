@@ -29,6 +29,13 @@ MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<CoreCourierService.Core
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
+// Register singleton MongoClient to prevent connection pool exhaustion
+builder.Services.AddSingleton<MongoDB.Driver.IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<MongoDbSettings>>().Value;
+    return new MongoDB.Driver.MongoClient(settings.ConnectionString);
+});
+
 // Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

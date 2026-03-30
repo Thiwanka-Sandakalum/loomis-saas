@@ -8,8 +8,8 @@ namespace CoreCourierService.Infrastructure.Repositories;
 
 public class TenantRepository : MongoRepository<Tenant>, ITenantRepository
 {
-    public TenantRepository(IOptions<MongoDbSettings> settings)
-        : base(settings, tenantContext: null) // Tenants are not tenant-scoped
+    public TenantRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
+        : base(client, settings, tenantContext: null) // Tenants are not tenant-scoped
     {
     }
 

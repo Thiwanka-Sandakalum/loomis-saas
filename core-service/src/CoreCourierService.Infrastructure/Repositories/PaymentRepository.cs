@@ -9,9 +9,10 @@ namespace CoreCourierService.Infrastructure.Repositories;
 public class PaymentRepository : MongoRepository<Payment>, IPaymentRepository
 {
     public PaymentRepository(
+        IMongoClient client,
         IOptions<MongoDbSettings> settings,
         ITenantContext tenantContext)
-        : base(settings, tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 

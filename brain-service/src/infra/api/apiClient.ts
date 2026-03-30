@@ -18,42 +18,63 @@ export class ApiClient {
     private async makeRequest<T>(
         endpoint: string,
         method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
-        body?: any
+        body?: any,
+        retries: number = 3
     ): Promise<ApiResponse<T>> {
-        try {
-            const url = `${this.baseUrl}${endpoint}`;
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-            };
+        const url = `${this.baseUrl}${endpoint}`;
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+        };
 
-            // Add API key if available
-            const apiKey = process.env.CORE_API_KEY;
-            if (apiKey) {
-                headers['X-API-KEY'] = apiKey;
-            }
-
-            const options: RequestInit = {
-                method,
-                headers,
-            };
-
-            if (body && (method === 'POST' || method === 'PATCH')) {
-                options.body = JSON.stringify(body);
-            }
-
-            const response = await fetch(url, options);
-            const data = await response.json();
-
-            return {
-                data,
-                status: response.status,
-            };
-        } catch (error: any) {
-            return {
-                error: error.message || 'API request failed',
-                status: 500,
-            };
+        const apiKey = process.env.CORE_API_KEY;
+        if (apiKey) {
+            headers['X-API-KEY'] = apiKey;
         }
+
+        const options: RequestInit = {
+            method,
+            headers,
+        };
+
+        if (body && (method === 'POST' || method === 'PATCH')) {
+            options.body = JSON.stringify(body);
+        }
+
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timeout);
+
+                const data = await response.json();
+
+                // Don't retry client errors (4xx) — only server errors
+                if (response.status >= 500 && attempt < retries) {
+                    await this.delay(Math.pow(2, attempt) * 100);
+                    continue;
+                }
+
+                return { data, status: response.status };
+            } catch (error: any) {
+                if (attempt === retries) {
+                    return {
+                        error: error.name === 'AbortError'
+                            ? `Request timeout after 8s: ${endpoint}`
+                            : error.message || 'API request failed',
+                        status: 500,
+                    };
+                }
+                await this.delay(Math.pow(2, attempt) * 100);
+            }
+        }
+
+        return { error: 'Max retries exceeded', status: 500 };
+    }
+
+    private delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // Shipment API Calls

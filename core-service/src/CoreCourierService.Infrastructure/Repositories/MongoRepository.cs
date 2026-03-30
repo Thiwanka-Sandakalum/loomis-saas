@@ -13,9 +13,8 @@ public class MongoRepository<T> : IRepository<T> where T : BaseEntity
     protected readonly IMongoCollection<T> _collection;
     protected readonly ITenantContext? _tenantContext;
 
-    public MongoRepository(IOptions<MongoDbSettings> settings, ITenantContext? tenantContext = null)
+    public MongoRepository(IMongoClient client, IOptions<MongoDbSettings> settings, ITenantContext? tenantContext = null)
     {
-        var client = new MongoClient(settings.Value.ConnectionString);
         var database = client.GetDatabase(settings.Value.DatabaseName);
 
         var collectionName = GetCollectionName();

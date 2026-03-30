@@ -10,9 +10,8 @@ public class SessionRepository : ISessionRepository
 {
     private readonly IMongoCollection<Session> _sessions;
 
-    public SessionRepository(IOptions<MongoDbSettings> settings)
+    public SessionRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
     {
-        var client = new MongoClient(settings.Value.ConnectionString);
         var database = client.GetDatabase(settings.Value.DatabaseName);
         _sessions = database.GetCollection<Session>("sessions");
 

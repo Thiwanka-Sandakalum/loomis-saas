@@ -1,5 +1,7 @@
+using CoreCourierService.Core;
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using System.Security.Cryptography;
 
 namespace CoreCourierService.Api.Services;
 
@@ -70,20 +72,13 @@ public class ShipmentService
 
     private static string GenerateTrackingNumber()
     {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        var random = new Random();
-        var suffix = new string(Enumerable.Repeat(chars, 8)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+        var bytes = RandomNumberGenerator.GetBytes(5);
+        var suffix = Convert.ToHexString(bytes).ToUpperInvariant();
         return $"LMS-{suffix}";
     }
 
     private static DateTime CalculateEstimatedDelivery(string serviceType)
     {
-        return serviceType switch
-        {
-            "Express" => DateTime.UtcNow.AddDays(2),
-            "Overnight" => DateTime.UtcNow.AddDays(1),
-            _ => DateTime.UtcNow.AddDays(5) // Standard
-        };
+        return DateTime.UtcNow.AddDays(ServiceConstants.DeliveryDays.GetDays(serviceType));
     }
 }

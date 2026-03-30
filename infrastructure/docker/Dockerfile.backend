@@ -1,0 +1,25 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:10.0 as builder
+WORKDIR /src
+
+COPY core-service/src/CoreCourierService.Core/ CoreCourierService.Core/
+COPY core-service/src/CoreCourierService.Infrastructure/ CoreCourierService.Infrastructure/
+COPY core-service/src/CoreCourierService.Api/ CoreCourierService.Api/
+
+WORKDIR /src/CoreCourierService.Api
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=builder /app/publish .
+
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
+
+USER app
+ENTRYPOINT ["dotnet", "CoreCourierService.Api.dll"]

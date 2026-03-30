@@ -9,9 +9,10 @@ namespace CoreCourierService.Infrastructure.Repositories;
 public class TenantUserRepository : MongoRepository<TenantUser>, ITenantUserRepository
 {
     public TenantUserRepository(
+        IMongoClient client,
         IOptions<MongoDbSettings> settings,
         ITenantContext tenantContext)
-        : base(settings, tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 

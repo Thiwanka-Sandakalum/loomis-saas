@@ -1,0 +1,27 @@
+# Build stage
+FROM node:20-alpine as builder
+WORKDIR /app
+
+COPY admin-dashboard/package*.json ./
+RUN npm ci
+
+COPY admin-dashboard/src ./src
+COPY admin-dashboard/angular.json .
+COPY admin-dashboard/tsconfig*.json ./
+COPY admin-dashboard/tailwind.config.js .
+COPY admin-dashboard/postcss.config.js .
+
+RUN npm run build -- --configuration production
+
+# Serve stage
+FROM node:20-alpine
+RUN npm install -g http-server
+
+WORKDIR /app
+COPY --from=builder /app/dist/loomis-app ./dist
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget -q --spider http://localhost:3000 || exit 1
+
+CMD ["http-server", "dist", "-p", "3000", "--gzip", "-c-1"]

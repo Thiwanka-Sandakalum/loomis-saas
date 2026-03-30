@@ -1,0 +1,105 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: loomis-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - loomis-network
+
+  core-service:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    container_name: loomis-core-service
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      MongoDbSettings__ConnectionString: mongodb://admin:password@mongodb:27017/loomis?authSource=admin
+      MongoDbSettings__DatabaseName: loomis
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - loomis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  brain-service:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.brain
+    container_name: loomis-brain-service
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      CORE_SERVICE_URL: http://core-service:5000
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      core-service:
+        condition: service_healthy
+    networks:
+      - loomis-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  admin-dashboard:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+    container_name: loomis-admin-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://localhost:5000
+    depends_on:
+      - core-service
+    networks:
+      - loomis-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: loomis-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - admin-dashboard
+      - core-service
+    networks:
+      - loomis-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  loomis-network:
+    driver: bridge

@@ -8,8 +8,8 @@ namespace CoreCourierService.Infrastructure.Repositories;
 
 public class ShipmentRepository : MongoRepository<Shipment>, IShipmentRepository
 {
-    public ShipmentRepository(IOptions<MongoDbSettings> settings, ITenantContext tenantContext)
-        : base(settings, tenantContext)
+    public ShipmentRepository(IMongoClient client, IOptions<MongoDbSettings> settings, ITenantContext tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 

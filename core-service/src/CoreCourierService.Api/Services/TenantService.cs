@@ -1,5 +1,6 @@
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using System.Security.Cryptography;
 
 namespace CoreCourierService.Api.Services;
 
@@ -84,10 +85,8 @@ public class TenantService
 
     private static string GenerateApiKey()
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        var random = new Random();
-        var key = new string(Enumerable.Repeat(chars, 32)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        var key = Convert.ToHexString(bytes).ToLowerInvariant();
         return $"cmp_live_{key}";
     }
 

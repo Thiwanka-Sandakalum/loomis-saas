@@ -10,9 +10,8 @@ public class AuditLogRepository : IAuditLogRepository
 {
     private readonly IMongoCollection<AuditLog> _auditLogs;
 
-    public AuditLogRepository(IOptions<MongoDbSettings> settings)
+    public AuditLogRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
     {
-        var client = new MongoClient(settings.Value.ConnectionString);
         var database = client.GetDatabase(settings.Value.DatabaseName);
         _auditLogs = database.GetCollection<AuditLog>("audit_logs");
 

@@ -1,3 +1,4 @@
+using CoreCourierService.Core;
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
 
@@ -7,11 +8,13 @@ public class RateService
 {
     private readonly IRateRepository _rateRepository;
     private readonly ITenantContext _tenantContext;
+    private readonly ICacheService _cache;
 
-    public RateService(IRateRepository rateRepository, ITenantContext tenantContext)
+    public RateService(IRateRepository rateRepository, ITenantContext tenantContext, ICacheService cache)
     {
         _rateRepository = rateRepository;
         _tenantContext = tenantContext;
+        _cache = cache;
     }
 
     public async Task<Rate> CreateRateAsync(string serviceType, decimal baseRate, decimal additionalKgRate, decimal minWeight, decimal maxWeight)
@@ -49,6 +52,10 @@ public class RateService
         if (maxWeight.HasValue) rate.MaxWeight = maxWeight.Value;
 
         var updated = await _rateRepository.UpdateAsync(id, rate);
+        if (updated)
+        {
+            _cache.Remove(CacheKeys.TenantRates($"{_tenantContext.TenantId}_{rate.ServiceType}"));
+        }
         return updated ? rate : null;
     }
 
@@ -59,7 +66,16 @@ public class RateService
 
     public async Task<(decimal total, decimal baseRate, decimal additionalCharges, string estimatedDelivery)> CalculateRateAsync(string serviceType, decimal weight)
     {
-        var rate = await _rateRepository.GetByServiceTypeAsync(serviceType);
+        var cacheKey = CacheKeys.TenantRates($"{_tenantContext.TenantId}_{serviceType}");
+        var rate = _cache.Get<Rate>(cacheKey);
+        if (rate == null)
+        {
+            rate = await _rateRepository.GetByServiceTypeAsync(serviceType);
+            if (rate != null)
+            {
+                _cache.Set(cacheKey, rate, TimeSpan.FromMinutes(30));
+            }
+        }
         if (rate == null)
             throw new Exception($"No rate found for service type: {serviceType}");
 
@@ -68,13 +84,7 @@ public class RateService
         var total = baseRate + additionalCharges;
 
         // Calculate estimated delivery based on service type
-        var estimatedDelivery = serviceType switch
-        {
-            "Standard" => DateTime.UtcNow.AddDays(5).ToString("yyyy-MM-dd"),
-            "Express" => DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-dd"),
-            "Overnight" => DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd"),
-            _ => DateTime.UtcNow.AddDays(5).ToString("yyyy-MM-dd")
-        };
+        var estimatedDelivery = DateTime.UtcNow.AddDays(ServiceConstants.DeliveryDays.GetDays(serviceType)).ToString("yyyy-MM-dd");
 
         return (total, baseRate, additionalCharges, estimatedDelivery);
     }

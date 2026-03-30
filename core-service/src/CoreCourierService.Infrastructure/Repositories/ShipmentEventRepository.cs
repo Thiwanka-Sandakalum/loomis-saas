@@ -9,9 +9,10 @@ namespace CoreCourierService.Infrastructure.Repositories;
 public class ShipmentEventRepository : MongoRepository<ShipmentEvent>, IShipmentEventRepository
 {
     public ShipmentEventRepository(
+        IMongoClient client,
         IOptions<MongoDbSettings> settings,
         ITenantContext tenantContext)
-        : base(settings, tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 

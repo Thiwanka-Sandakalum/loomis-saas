@@ -1,12 +1,13 @@
 using CoreCourierService.Core.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CoreCourierService.Api.DTOs;
 
 public record CreateShipmentRequest(
-    ContactInfo Sender,
-    ContactInfo Receiver,
-    ParcelInfo Parcel,
-    string ServiceType,
+    [Required] ContactInfo Sender,
+    [Required] ContactInfo Receiver,
+    [Required] ParcelInfo Parcel,
+    [Required][StringLength(20, MinimumLength = 3)] string ServiceType,
     string? SpecialInstructions = null);
 
 public record ShipmentResponse(
@@ -21,8 +22,8 @@ public record ShipmentResponse(
     DateTime CreatedAt);
 
 public record UpdateStatusRequest(
-    string Status,
-    string Location,
+    [Required][StringLength(30, MinimumLength = 2)] string Status,
+    [Required][StringLength(200, MinimumLength = 2)] string Location,
     string? Notes = null);
 
 public record PagedResponse<T>(

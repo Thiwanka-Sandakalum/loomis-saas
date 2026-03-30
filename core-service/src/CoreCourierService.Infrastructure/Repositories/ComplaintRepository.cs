@@ -9,9 +9,10 @@ namespace CoreCourierService.Infrastructure.Repositories;
 public class ComplaintRepository : MongoRepository<Complaint>, IComplaintRepository
 {
     public ComplaintRepository(
+        IMongoClient client,
         IOptions<MongoDbSettings> settings,
         ITenantContext tenantContext)
-        : base(settings, tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 

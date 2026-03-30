@@ -28,14 +28,18 @@ public class TenantResolverMiddleware
             var tenantUser = await tenantUserService.GetByAuth0UserIdAsync(auth0UserId);
             if (tenantUser != null)
             {
+                var tenant = await tenantService.GetByIdAsync(tenantUser.TenantId);
+                if (tenant == null)
+                {
+                    logger.LogWarning("Tenant {TenantId} not found for user {Auth0UserId}", tenantUser.TenantId, auth0UserId);
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    await context.Response.WriteAsJsonAsync(new { error = "Tenant not found or inactive" });
+                    return;
+                }
+
                 tenantContext.SetTenant(tenantUser.TenantId);
                 context.Items["TenantId"] = tenantUser.TenantId;
-
-                var tenant = await tenantService.GetByIdAsync(tenantUser.TenantId);
-                if (tenant != null)
-                {
-                    context.Items["TenantPlan"] = tenant.Plan;
-                }
+                context.Items["TenantPlan"] = tenant.Plan;
 
                 await _next(context);
                 return;

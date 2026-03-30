@@ -9,9 +9,10 @@ namespace CoreCourierService.Infrastructure.Repositories;
 public class RateRepository : MongoRepository<Rate>, IRateRepository
 {
     public RateRepository(
+        IMongoClient client,
         IOptions<MongoDbSettings> settings,
         ITenantContext tenantContext)
-        : base(settings, tenantContext)
+        : base(client, settings, tenantContext)
     {
     }
 
