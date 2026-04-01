@@ -1,8 +1,8 @@
 export const environment = {
-    production: true,
-    apiUrl: 'http://0.0.0.0:8080',
-    wsUrl: 'wss://lomis-main-core-905498284628.europe-west1.run.app',
-    brainApiUrl: 'http://thiwa-ThinkPad-T460s:8000', // Use proxy to avoid CORS issues
+    production: false,
+    apiUrl: 'http://localhost:8080',
+    wsUrl: 'ws://localhost:8080',
+    brainApiUrl: 'http://localhost:8001',
     apiKey: 'cmp_live_680fm01pjn8lcyk2wjkfsk4u39qie79q', // Default tenant API key for sandbox
     auth0: {
         audience: 'https://loomis-main-srv/',
