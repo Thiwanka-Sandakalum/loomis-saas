@@ -42,6 +42,8 @@ const auth0Config = mergeApplicationConfig(appConfig, {
       cacheLocation: 'localstorage',
       // Enable refresh token rotation for better security
       useRefreshTokens: true,
+      // Fall back to silent iframe renewal when a refresh token is not yet available
+      useRefreshTokensFallback: true,
       // Silently check for authentication on app load
       skipRedirectCallback: window.location.pathname === '/login'
     }),

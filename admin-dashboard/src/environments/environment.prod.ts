@@ -9,6 +9,6 @@ export const environment = {
         domain: 'dev-dtn8wjllia6xrmrl.us.auth0.com',
         clientId: 'nbtzmy2WVNIKzQ5oLlDjKvZ5cknwudau',
         redirectUri: window.location.origin,
-        scope: 'openid profile email'
+        scope: 'openid profile email offline_access'
     }
 };
