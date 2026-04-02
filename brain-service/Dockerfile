@@ -25,6 +25,8 @@ RUN npm ci --only=production
 
 # Copy built output and required files
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/openapi.yaml ./
 
 
