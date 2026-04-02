@@ -2,7 +2,7 @@ export const environment = {
     production: false,
     apiUrl: 'http://localhost:8080',
     wsUrl: 'ws://localhost:8080',
-    brainApiUrl: 'http://localhost:8001',
+    brainApiUrl: 'http://localhost:8000',
     apiKey: 'cmp_live_680fm01pjn8lcyk2wjkfsk4u39qie79q', // Default tenant API key for sandbox
     auth0: {
         audience: 'https://loomis-main-srv/',

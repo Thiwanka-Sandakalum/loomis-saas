@@ -5,7 +5,7 @@ import { complaintTool } from '../../tools/complaintTool.js';
 
 export const customerAgent = new LlmAgent({
     name: 'customer_experience_agent',
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.1-flash-lite-preview',
     description: 'Handles customer inquiries, tracking, and complaints.',
     instruction: `You are the primary Customer Experience Agent for Courier Service.
 Your goals are:
