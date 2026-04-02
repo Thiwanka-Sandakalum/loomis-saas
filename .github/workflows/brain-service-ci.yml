@@ -1,0 +1,75 @@
+name: Brain Service CI
+
+on:
+    push:
+        branches: [main, develop]
+        paths:
+            - "brain-service/**"
+            - ".github/workflows/brain-service-ci.yml"
+    pull_request:
+        branches: [main, develop]
+        paths:
+            - "brain-service/**"
+            - ".github/workflows/brain-service-ci.yml"
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}/brain-service
+    NODE_VERSION: "20"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+            security-events: write
+
+        services:
+            mongodb:
+                image: mongo:7
+                options: >-
+                    --health-cmd mongosh
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+                ports:
+                    - 27017:27017
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: "npm"
+                  cache-dependency-path: "brain-service/package-lock.json"
+
+            - name: Install dependencies
+              run: npm install
+              working-directory: ./brain-service
+
+            - name: Lint code
+              run: npm run lint
+              working-directory: ./brain-service
+              continue-on-error: true
+
+            - name: Run tests
+              run: npm test -- --coverage
+              working-directory: ./brain-service
+              env:
+                  MONGODB_URI: "mongodb://localhost:27017/brain-service-test"
+              continue-on-error: true
+
+            - name: Build
+              run: npm run build
+              working-directory: ./brain-service
+
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v3
+              with:
+                  files: ./brain-service/coverage/lcov.info
+                  flags: brain-service
+                  fail_ci_if_error: false
