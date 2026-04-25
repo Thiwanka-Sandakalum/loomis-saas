@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/TestResults/
+**/.vs/
+**/.vscode/
+.git/
+.gitignore
+.env
+*.user
+*.suo
+*.swp
+*.md
+postman/

@@ -3,6 +3,8 @@ using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using CoreCourierService.Core;
 
 namespace CoreCourierService.Api.Services;
 
@@ -29,13 +31,8 @@ public class TelegramIntegrationService : ITelegramIntegrationService
             ?? "https://api.courierservice.com";
     }
 
-    public async Task<TenantIntegration> SetupTelegramBotAsync(object requestObj)
+    public async Task<TenantIntegration> SetupTelegramBotAsync(SetupTelegramRequest request)
     {
-        if (requestObj is not SetupTelegramRequest request)
-        {
-            throw new ArgumentException("Invalid request type", nameof(requestObj));
-        }
-
         var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
 
         // Verify bot token with Telegram API
@@ -45,13 +42,14 @@ public class TelegramIntegrationService : ITelegramIntegrationService
             throw new InvalidOperationException("Invalid Telegram bot token. Please verify your token.");
         }
 
-        var existing = await _repository.GetByTenantIdAndTypeAsync(tenantId, "telegram");
+        var existing = await _repository.GetByTenantIdAndTypeAsync(tenantId, ServiceConstants.IntegrationTypes.Telegram);
 
         var config = new TelegramConfig
         {
             BotToken = request.BotToken,
             BotUsername = request.BotUsername,
             WebhookUrl = GenerateWebhookUrl(tenantId),
+            WebhookSecret = GenerateWebhookSecret(),
             AllowedCommands = request.AllowedCommands ?? GetDefaultCommands(),
             AutoReplyEnabled = request.AutoReplyEnabled,
             ForwardToBrain = request.ForwardToBrain,
@@ -81,7 +79,7 @@ public class TelegramIntegrationService : ITelegramIntegrationService
             integration = new TenantIntegration
             {
                 TenantId = tenantId,
-                IntegrationType = "telegram",
+                IntegrationType = ServiceConstants.IntegrationTypes.Telegram,
                 Config = config,
                 IsActive = true
             };
@@ -102,7 +100,7 @@ public class TelegramIntegrationService : ITelegramIntegrationService
     {
         var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
 
-        var integration = await _repository.GetByTenantIdAndTypeAsync(tenantId, "telegram");
+        var integration = await _repository.GetByTenantIdAndTypeAsync(tenantId, ServiceConstants.IntegrationTypes.Telegram);
 
         if (integration?.Config is not TelegramConfig config)
         {
@@ -128,8 +126,7 @@ public class TelegramIntegrationService : ITelegramIntegrationService
     public async Task<TenantIntegration?> GetIntegrationStatusAsync()
     {
         var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
-
-        return await _repository.GetByTenantIdAndTypeAsync(tenantId, "telegram");
+        return await _repository.GetByTenantIdAndTypeAsync(tenantId, ServiceConstants.IntegrationTypes.Telegram);
     }
 
     public async Task<bool> TestConnectionAsync(string botToken)
@@ -160,7 +157,7 @@ public class TelegramIntegrationService : ITelegramIntegrationService
     {
         var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
 
-        var integration = await _repository.GetByTenantIdAndTypeAsync(tenantId, "telegram");
+        var integration = await _repository.GetByTenantIdAndTypeAsync(tenantId, ServiceConstants.IntegrationTypes.Telegram);
 
         if (integration?.Config is not TelegramConfig config)
         {
@@ -187,14 +184,9 @@ public class TelegramIntegrationService : ITelegramIntegrationService
         }
     }
 
-    public async Task<bool> UpdateConfigAsync(object requestObj)
+    public async Task<bool> UpdateConfigAsync(SetupTelegramRequest request)
     {
-        if (requestObj is not SetupTelegramRequest request)
-        {
-            throw new ArgumentException("Invalid request type", nameof(requestObj));
-        }
-
-        return await SetupTelegramBotAsync(requestObj) != null;
+        return await SetupTelegramBotAsync(request) != null;
     }
 
     private async Task SetupWebhookAsync(TelegramConfig config)
@@ -205,7 +197,8 @@ public class TelegramIntegrationService : ITelegramIntegrationService
         {
             url = config.WebhookUrl,
             allowed_updates = new[] { "message", "callback_query" },
-            drop_pending_updates = false
+            drop_pending_updates = false,
+            secret_token = config.WebhookSecret
         };
 
         var response = await _httpClient.PostAsJsonAsync(url, payload);
@@ -239,6 +232,12 @@ public class TelegramIntegrationService : ITelegramIntegrationService
         {
             _logger.LogWarning(ex, "Error removing Telegram webhook");
         }
+    }
+
+    private static string GenerateWebhookSecret()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 
     private string GenerateWebhookUrl(string tenantId)

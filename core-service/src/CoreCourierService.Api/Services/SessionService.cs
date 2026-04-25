@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace CoreCourierService.Api.Services;
 
-public class SessionService
+public class SessionService : ISessionService
 {
     private readonly ISessionRepository _sessionRepository;
     private readonly ITenantContext _tenantContext;
@@ -72,7 +72,7 @@ public class SessionService
             return null;
         }
 
-        session.ExpiresAt = DateTime.UtcNow.AddHours(additionalHours);
+        session.ExpiresAt = session.ExpiresAt.AddHours(additionalHours);
         session.UpdatedAt = DateTime.UtcNow;
 
         return await _sessionRepository.UpdateAsync(sessionId, session);

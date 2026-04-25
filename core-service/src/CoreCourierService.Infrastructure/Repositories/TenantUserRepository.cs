@@ -37,4 +37,26 @@ public class TenantUserRepository : MongoRepository<TenantUser>, ITenantUserRepo
         );
         return await _collection.Find(filter).AnyAsync();
     }
+
+    public async Task<TenantUser?> GetPendingByEmailAsync(string email)
+    {
+        var filter = Builders<TenantUser>.Filter.And(
+            Builders<TenantUser>.Filter.Eq(u => u.Email, email),
+            Builders<TenantUser>.Filter.Eq(u => u.Status, CoreCourierService.Core.ServiceConstants.UserStatuses.Invited)
+        );
+        return await _collection.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<TenantUser?> GetPendingInvitationAsync(string email, string invitationToken)
+    {
+        var now = DateTime.UtcNow;
+        var filter = Builders<TenantUser>.Filter.And(
+            Builders<TenantUser>.Filter.Eq(u => u.Email, email),
+            Builders<TenantUser>.Filter.Eq(u => u.Status, CoreCourierService.Core.ServiceConstants.UserStatuses.Invited),
+            Builders<TenantUser>.Filter.Eq(u => u.InvitationToken, invitationToken),
+            Builders<TenantUser>.Filter.Gt(u => u.InvitationExpiresAt, now)
+        );
+
+        return await _collection.Find(filter).FirstOrDefaultAsync();
+    }
 }

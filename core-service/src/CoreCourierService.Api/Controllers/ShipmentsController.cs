@@ -6,17 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/shipments")]
 public class ShipmentsController : ControllerBase
 {
-    private readonly ShipmentService _shipmentService;
-    private readonly ShipmentEventService _eventService;
+    private readonly IShipmentService _shipmentService;
+    private readonly IShipmentEventService _eventService;
     private readonly ILogger<ShipmentsController> _logger;
 
     public ShipmentsController(
-        ShipmentService shipmentService,
-        ShipmentEventService eventService,
+        IShipmentService shipmentService,
+        IShipmentEventService eventService,
         ILogger<ShipmentsController> logger)
     {
         _shipmentService = shipmentService;
@@ -87,7 +88,7 @@ public class ShipmentsController : ControllerBase
         var shipment = await _shipmentService.GetByTrackingNumberAsync(trackingNumber);
 
         if (shipment == null)
-            return NotFound(new { error = "Shipment not found", trackingNumber });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Shipment not found", new { trackingNumber }));
 
         var response = new ShipmentResponse(
             shipment.Id,
@@ -108,18 +109,16 @@ public class ShipmentsController : ControllerBase
         string trackingNumber,
         [FromBody] UpdateStatusRequest request)
     {
-        var updated = await _shipmentService.UpdateStatusAsync(
+        var shipment = await _shipmentService.UpdateStatusAsync(
             trackingNumber,
             request.Status,
             request.Location);
 
-        if (!updated)
-            return NotFound(new { error = "Shipment not found", trackingNumber });
-
-        var shipment = await _shipmentService.GetByTrackingNumberAsync(trackingNumber);
+        if (shipment == null)
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Shipment not found", new { trackingNumber }));
 
         var response = new ShipmentResponse(
-            shipment!.Id,
+            shipment.Id,
             shipment.TrackingNumber,
             shipment.Sender,
             shipment.Receiver,
@@ -137,20 +136,13 @@ public class ShipmentsController : ControllerBase
         string trackingNumber,
         [FromBody] CreateEventRequest request)
     {
-        try
-        {
-            var shipmentEvent = await _eventService.CreateEventAsync(
-                trackingNumber,
-                request.Status,
-                request.Location,
-                request.Notes);
+        var shipmentEvent = await _eventService.CreateEventAsync(
+            trackingNumber,
+            request.Status,
+            request.Location,
+            request.Notes);
 
-            return CreatedAtAction(nameof(GetShipmentEvents), new { trackingNumber }, shipmentEvent);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = new { code = "EVENT_ERROR", message = ex.Message } });
-        }
+        return CreatedAtAction(nameof(GetShipmentEvents), new { trackingNumber }, shipmentEvent);
     }
 
     [HttpGet("{trackingNumber}/events")]
@@ -165,7 +157,7 @@ public class ShipmentsController : ControllerBase
     {
         var shipment = await _shipmentService.GetShipmentByIdAsync(shipmentId);
         if (shipment == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Shipment not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Shipment not found"));
 
         var events = await _eventService.GetEventsByTrackingNumberAsync(shipment.TrackingNumber);
         return Ok(new { data = events });

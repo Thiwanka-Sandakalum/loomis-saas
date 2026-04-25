@@ -1,4 +1,5 @@
 using CoreCourierService.Api.DTOs;
+using CoreCourierService.Api.Services;
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -11,16 +12,16 @@ namespace CoreCourierService.Api.Controllers;
 public class IntegrationsController : ControllerBase
 {
     private readonly ITelegramIntegrationService _telegramService;
-    private readonly ITelegramWebhookHandler _webhookHandler;
+    private readonly ITelegramWebhookQueue _webhookQueue;
     private readonly ILogger<IntegrationsController> _logger;
 
     public IntegrationsController(
         ITelegramIntegrationService telegramService,
-        ITelegramWebhookHandler webhookHandler,
+        ITelegramWebhookQueue webhookQueue,
         ILogger<IntegrationsController> logger)
     {
         _telegramService = telegramService;
-        _webhookHandler = webhookHandler;
+        _webhookQueue = webhookQueue;
         _logger = logger;
     }
 
@@ -37,7 +38,7 @@ public class IntegrationsController : ControllerBase
 
             if (integration.Config is not TelegramConfig config)
             {
-                return StatusCode(500, new { error = "Invalid configuration type" });
+                return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "Invalid configuration type"));
             }
 
             var response = new TelegramIntegrationResponse(
@@ -66,26 +67,12 @@ public class IntegrationsController : ControllerBase
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "Failed to setup Telegram bot");
-            return BadRequest(new
-            {
-                error = new
-                {
-                    code = "INVALID_BOT_TOKEN",
-                    message = ex.Message
-                }
-            });
+            return BadRequest(ApiErrors.Create("INVALID_BOT_TOKEN", "Bot token validation failed. Please verify your bot token and try again."));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error setting up Telegram integration");
-            return StatusCode(500, new
-            {
-                error = new
-                {
-                    code = "INTERNAL_ERROR",
-                    message = "An error occurred while setting up Telegram integration"
-                }
-            });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "An error occurred while setting up Telegram integration"));
         }
     }
 
@@ -99,14 +86,7 @@ public class IntegrationsController : ControllerBase
 
             if (!result)
             {
-                return NotFound(new
-                {
-                    error = new
-                    {
-                        code = "NOT_FOUND",
-                        message = "No Telegram integration found for this tenant"
-                    }
-                });
+                return NotFound(ApiErrors.Create("NOT_FOUND", "No Telegram integration found for this tenant"));
             }
 
             return Ok(new
@@ -118,14 +98,7 @@ public class IntegrationsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error disconnecting Telegram bot");
-            return StatusCode(500, new
-            {
-                error = new
-                {
-                    code = "INTERNAL_ERROR",
-                    message = "An error occurred while disconnecting Telegram bot"
-                }
-            });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "An error occurred while disconnecting Telegram bot"));
         }
     }
 
@@ -157,14 +130,7 @@ public class IntegrationsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting Telegram status");
-            return StatusCode(500, new
-            {
-                error = new
-                {
-                    code = "INTERNAL_ERROR",
-                    message = "An error occurred while retrieving Telegram status"
-                }
-            });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "An error occurred while retrieving Telegram status"));
         }
     }
 
@@ -178,14 +144,7 @@ public class IntegrationsController : ControllerBase
 
             if (webhookInfo == null)
             {
-                return NotFound(new
-                {
-                    error = new
-                    {
-                        code = "NOT_FOUND",
-                        message = "No Telegram integration found or webhook not configured"
-                    }
-                });
+                return NotFound(ApiErrors.Create("NOT_FOUND", "No Telegram integration found or webhook not configured"));
             }
 
             return Ok(new { data = webhookInfo });
@@ -193,14 +152,7 @@ public class IntegrationsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting webhook info");
-            return StatusCode(500, new
-            {
-                error = new
-                {
-                    code = "INTERNAL_ERROR",
-                    message = "An error occurred while retrieving webhook information"
-                }
-            });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "An error occurred while retrieving webhook information"));
         }
     }
 
@@ -223,14 +175,7 @@ public class IntegrationsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error testing Telegram connection");
-            return StatusCode(500, new
-            {
-                error = new
-                {
-                    code = "INTERNAL_ERROR",
-                    message = "An error occurred while testing the connection"
-                }
-            });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "An error occurred while testing the connection"));
         }
     }
 
@@ -262,13 +207,13 @@ public class IntegrationsController : ControllerBase
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to deserialize TelegramUpdate from webhook body");
-                return BadRequest("Invalid Telegram update payload");
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invalid Telegram update payload"));
             }
 
             if (update == null)
             {
                 _logger.LogWarning("TelegramUpdate is null after deserialization");
-                return BadRequest("Empty Telegram update");
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Empty Telegram update"));
             }
 
             _logger.LogInformation(
@@ -276,22 +221,7 @@ public class IntegrationsController : ControllerBase
                 tenantId,
                 update.UpdateId);
 
-            // Process webhook asynchronously (fire and forget)
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await _webhookHandler.HandleUpdateAsync(tenantId, update);
-                    // If you call HandleCommandAsync, ForwardToBrainServiceAsync, or SendMessageAsync elsewhere, ensure tenantId is passed as required by the new interface.
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(
-                        ex,
-                        "Error processing Telegram webhook for tenant {TenantId}",
-                        tenantId);
-                }
-            });
+            await _webhookQueue.QueueAsync(new TelegramWebhookWorkItem(tenantId, update), HttpContext.RequestAborted);
 
             // Return 200 immediately to Telegram
             return Ok();

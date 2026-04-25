@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-build-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+
+      - name: Restore
+        run: dotnet restore CoreCourierService.slnx
+
+      - name: Build
+        run: dotnet build CoreCourierService.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: >-
+          dotnet test CoreCourierService.slnx
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Publish API
+        run: >-
+          dotnet publish src/CoreCourierService.Api/CoreCourierService.Api.csproj
+          --configuration Release
+          --no-build
+          --output ./artifacts/api
+
+      - name: Create package archive
+        run: tar -czf core-courier-api.tar.gz -C ./artifacts api
+
+      - name: Upload build package
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-courier-api
+          path: core-courier-api.tar.gz
+          if-no-files-found: error
+
+      - name: Upload test and coverage outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/*.trx
+            **/TestResults/**
+          if-no-files-found: warn

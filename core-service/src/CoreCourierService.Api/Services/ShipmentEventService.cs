@@ -1,9 +1,10 @@
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using CoreCourierService.Api.Middleware;
 
 namespace CoreCourierService.Api.Services;
 
-public class ShipmentEventService
+public class ShipmentEventService : IShipmentEventService
 {
     private readonly IShipmentEventRepository _eventRepository;
     private readonly IShipmentRepository _shipmentRepository;
@@ -24,7 +25,7 @@ public class ShipmentEventService
         // Verify shipment exists
         var shipment = await _shipmentRepository.GetByTrackingNumberAsync(trackingNumber);
         if (shipment == null)
-            throw new Exception($"Shipment not found: {trackingNumber}");
+            throw new NotFoundException("Shipment", trackingNumber);
 
         var shipmentEvent = new ShipmentEvent
         {

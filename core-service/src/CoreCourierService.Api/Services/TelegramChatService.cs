@@ -3,18 +3,18 @@ using CoreCourierService.Core.Interfaces;
 
 namespace CoreCourierService.Api.Services;
 
-public class TelegramChatService
+public class TelegramChatService : ITelegramChatService
 {
     private readonly ITelegramChatRepository _chatRepository;
     private readonly ITelegramMessageRepository _messageRepository;
     private readonly ITenantContext _tenantContext;
-    private readonly SessionService _sessionService;
+    private readonly ISessionService _sessionService;
 
     public TelegramChatService(
         ITelegramChatRepository chatRepository,
         ITelegramMessageRepository messageRepository,
         ITenantContext tenantContext,
-        SessionService sessionService)
+        ISessionService sessionService)
     {
         _chatRepository = chatRepository;
         _messageRepository = messageRepository;
@@ -91,9 +91,10 @@ public class TelegramChatService
         var userId = $"telegram_{chatId}";
         var existingSessions = await _sessionService.GetUserSessionsAsync(userId);
 
-        if (existingSessions.Any(s => s.IsActive))
+        var activeSession = existingSessions.FirstOrDefault(s => s.IsActive);
+        if (activeSession != null)
         {
-            return existingSessions.First();
+            return activeSession;
         }
 
         return await _sessionService.CreateSessionAsync(userId, "telegram", 720); // 30 days

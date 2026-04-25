@@ -44,6 +44,9 @@ public class TelegramConfig : IntegrationConfig
     [BsonElement("greeting_message")]
     public string? GreetingMessage { get; set; }
 
+    [BsonElement("webhook_secret")]
+    public string? WebhookSecret { get; set; }
+
     public TelegramConfig()
     {
         Type = "telegram";

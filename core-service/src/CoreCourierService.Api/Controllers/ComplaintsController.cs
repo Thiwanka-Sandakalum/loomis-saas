@@ -1,16 +1,18 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/complaints")]
 public class ComplaintsController : ControllerBase
 {
-    private readonly ComplaintService _complaintService;
+    private readonly IComplaintService _complaintService;
 
-    public ComplaintsController(ComplaintService complaintService)
+    public ComplaintsController(IComplaintService complaintService)
     {
         _complaintService = complaintService;
     }
@@ -18,21 +20,14 @@ public class ComplaintsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateComplaint([FromBody] CreateComplaintRequest request)
     {
-        try
-        {
-            var complaint = await _complaintService.CreateComplaintAsync(
-                request.TrackingNumber,
-                request.Type,
-                request.Description,
-                request.CustomerEmail,
-                request.CustomerPhone);
+        var complaint = await _complaintService.CreateComplaintAsync(
+            request.TrackingNumber,
+            request.Type,
+            request.Description,
+            request.CustomerEmail,
+            request.CustomerPhone);
 
-            return CreatedAtAction(nameof(GetComplaint), new { complaintId = complaint.Id }, complaint);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = new { code = "COMPLAINT_ERROR", message = ex.Message } });
-        }
+        return CreatedAtAction(nameof(GetComplaint), new { complaintId = complaint.Id }, complaint);
     }
 
     [HttpGet]
@@ -54,8 +49,8 @@ public class ComplaintsController : ControllerBase
             return Ok(new { data = complaints, pagination = new { page, pageSize } });
         }
 
-        // TODO: Implement GetAll with pagination
-        return Ok(new { data = new List<object>(), pagination = new { page, pageSize } });
+        var (allComplaints, total) = await _complaintService.GetAllPagedAsync(page, pageSize);
+        return Ok(new { data = allComplaints, pagination = new { page, pageSize, total } });
     }
 
     [HttpGet("{complaintId}")]
@@ -63,7 +58,7 @@ public class ComplaintsController : ControllerBase
     {
         var complaint = await _complaintService.GetComplaintByIdAsync(complaintId);
         if (complaint == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Complaint not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Complaint not found"));
 
         return Ok(complaint);
     }
@@ -85,7 +80,7 @@ public class ComplaintsController : ControllerBase
             request.AssignedTo);
 
         if (complaint == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Complaint not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Complaint not found"));
 
         return Ok(complaint);
     }

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace CoreCourierService.Api.Services;
 
-public class ShipmentService
+public class ShipmentService : IShipmentService
 {
     private readonly IShipmentRepository _shipmentRepository;
     private readonly ITenantContext _tenantContext;
@@ -23,6 +23,8 @@ public class ShipmentService
 
     public async Task<Shipment> CreateShipmentAsync(Shipment shipment)
     {
+        shipment.ServiceType = ServiceConstants.ServiceTypes.Canonicalize(shipment.ServiceType);
+
         // Generate tracking number
         shipment.TrackingNumber = GenerateTrackingNumber();
 
@@ -59,15 +61,35 @@ public class ShipmentService
             orderBy: s => s.CreatedAt);
     }
 
-    public async Task<bool> UpdateStatusAsync(string trackingNumber, string newStatus, string location)
+    public async Task<Shipment?> UpdateStatusAsync(string trackingNumber, string newStatus, string location)
     {
         var shipment = await _shipmentRepository.GetByTrackingNumberAsync(trackingNumber);
-        if (shipment == null) return false;
+        if (shipment == null) return null;
 
         shipment.Status = newStatus;
         shipment.UpdatedAt = DateTime.UtcNow;
 
-        return await _shipmentRepository.UpdateAsync(shipment.Id, shipment);
+        var updated = await _shipmentRepository.UpdateAsync(shipment.Id, shipment);
+        return updated ? shipment : null;
+    }
+
+    public async Task<long> GetTotalCountAsync()
+    {
+        var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
+        return await _shipmentRepository.CountAsync(s => s.TenantId == tenantId);
+    }
+
+    public async Task<long> GetCountByStatusAsync(string status)
+    {
+        var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
+        return await _shipmentRepository.CountAsync(s => s.TenantId == tenantId && s.Status == status);
+    }
+
+    public async Task<long> GetActiveCountAsync()
+    {
+        var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
+        return await _shipmentRepository.CountAsync(
+            s => s.TenantId == tenantId && s.Status != "Delivered" && s.Status != "Cancelled");
     }
 
     private static string GenerateTrackingNumber()

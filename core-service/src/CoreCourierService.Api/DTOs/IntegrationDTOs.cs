@@ -81,13 +81,6 @@ public class AdkEventContent
 
 // ==================== SETUP & CONFIGURATION ====================
 
-public record SetupTelegramRequest(
-    string BotToken,
-    string BotUsername,
-    List<string>? AllowedCommands = null,
-    bool AutoReplyEnabled = false,
-    bool ForwardToBrain = true,
-    string? GreetingMessage = null);
 
 public record TelegramIntegrationResponse(
     string Id,

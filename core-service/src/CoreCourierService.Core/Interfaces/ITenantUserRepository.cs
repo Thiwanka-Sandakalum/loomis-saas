@@ -18,4 +18,14 @@ public interface ITenantUserRepository : IRepository<TenantUser>
     /// Check if an Auth0 user already belongs to a tenant
     /// </summary>
     Task<bool> ExistsAsync(string auth0UserId, string tenantId);
+
+    /// <summary>
+    /// Find a pending (invited but not yet accepted) tenant user by email
+    /// </summary>
+    Task<TenantUser?> GetPendingByEmailAsync(string email);
+
+    /// <summary>
+    /// Find a pending invitation by email and invitation token.
+    /// </summary>
+    Task<TenantUser?> GetPendingInvitationAsync(string email, string invitationToken);
 }

@@ -4,12 +4,12 @@ namespace CoreCourierService.Core.Interfaces;
 
 public interface ITelegramIntegrationService
 {
-    Task<TenantIntegration> SetupTelegramBotAsync(object request);
+    Task<TenantIntegration> SetupTelegramBotAsync(SetupTelegramRequest request);
     Task<bool> DisconnectTelegramBotAsync();
     Task<TenantIntegration?> GetIntegrationStatusAsync();
     Task<bool> TestConnectionAsync(string botToken);
     Task<object?> GetWebhookInfoAsync();
-    Task<bool> UpdateConfigAsync(object request);
+    Task<bool> UpdateConfigAsync(SetupTelegramRequest request);
 }
 
 public interface ITelegramWebhookHandler

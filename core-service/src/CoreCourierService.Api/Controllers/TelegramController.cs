@@ -1,5 +1,8 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using CoreCourierService.Core;
+using CoreCourierService.Core.Entities;
+using CoreCourierService.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,24 +13,27 @@ namespace CoreCourierService.Api.Controllers;
 [Route("api/telegram")]
 public class TelegramController : ControllerBase
 {
-    private readonly TelegramChatService _chatService;
+    private readonly ITelegramChatService _chatService;
     private readonly ILogger<TelegramController> _logger;
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
     private readonly CoreCourierService.Core.Interfaces.ITenantContext _tenantContext;
+    private readonly ITenantIntegrationRepository _integrationRepository;
 
     public TelegramController(
-        TelegramChatService chatService,
+        ITelegramChatService chatService,
         ILogger<TelegramController> logger,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
-        CoreCourierService.Core.Interfaces.ITenantContext tenantContext)
+        CoreCourierService.Core.Interfaces.ITenantContext tenantContext,
+        ITenantIntegrationRepository integrationRepository)
     {
         _chatService = chatService;
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient();
         _configuration = configuration;
         _tenantContext = tenantContext;
+        _integrationRepository = integrationRepository;
     }
 
     /// <summary>
@@ -38,20 +44,18 @@ public class TelegramController : ControllerBase
     {
         var chats = await _chatService.GetAllChatsAsync(skip, limit);
 
-        var chatResponses = new List<TelegramChatResponse>();
-        foreach (var chat in chats)
-        {
-            var messageCount = await _chatService.GetChatMessageCountAsync(chat.ChatId);
-            chatResponses.Add(new TelegramChatResponse(
-                chat.ChatId,
-                chat.UserName,
-                chat.FirstName,
-                chat.LastName,
-                chat.CreatedAt,
-                chat.LastMessageAt,
-                messageCount
-            ));
-        }
+        var countTasks = chats.Select(c => _chatService.GetChatMessageCountAsync(c.ChatId));
+        var counts = await Task.WhenAll(countTasks);
+
+        var chatResponses = chats.Select((chat, i) => new TelegramChatResponse(
+            chat.ChatId,
+            chat.UserName,
+            chat.FirstName,
+            chat.LastName,
+            chat.CreatedAt,
+            chat.LastMessageAt,
+            counts[i]
+        )).ToList();
 
         return Ok(new TelegramChatListResponse(chatResponses, chatResponses.Count, skip, limit));
     }
@@ -91,16 +95,29 @@ public class TelegramController : ControllerBase
     {
         try
         {
+            // Verify Telegram webhook secret token (CRIT-4)
+            var integration = await _integrationRepository.GetByTenantIdAndTypeAsync(tenantId, ServiceConstants.IntegrationTypes.Telegram);
+            if (integration?.Config is TelegramConfig telegramConfig
+                && !string.IsNullOrEmpty(telegramConfig.WebhookSecret))
+            {
+                var providedSecret = Request.Headers["X-Telegram-Bot-Api-Secret-Token"].FirstOrDefault();
+                if (providedSecret != telegramConfig.WebhookSecret)
+                {
+                    _logger.LogWarning("Telegram webhook secret mismatch for tenant {TenantId}", tenantId);
+                    return Unauthorized();
+                }
+            }
+
             // Set tenant context from route
             if (!string.IsNullOrEmpty(tenantId))
             {
-                _logger.LogInformation($"Setting tenant context to {tenantId}");
+                _logger.LogInformation("Setting tenant context to {TenantId}", tenantId);
                 _tenantContext.SetTenant(tenantId);
             }
             else
             {
                 _logger.LogWarning("TenantId missing in webhook route");
-                return BadRequest("TenantId is required");
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "TenantId is required"));
             }
 
             if (update.Message == null)
@@ -170,7 +187,7 @@ public class TelegramController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error sending Telegram message");
-            return StatusCode(500, new { success = false, message = ex.Message });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "Failed to send Telegram message"));
         }
     }
 

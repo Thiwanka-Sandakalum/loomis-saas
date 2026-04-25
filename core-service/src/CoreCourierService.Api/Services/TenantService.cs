@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace CoreCourierService.Api.Services;
 
-public class TenantService
+public class TenantService : ITenantService
 {
     private readonly ITenantRepository _tenantRepository;
     private readonly ILogger<TenantService> _logger;
@@ -70,12 +70,11 @@ public class TenantService
 
     public async Task<Tenant?> GetByClientIdAsync(string clientId)
     {
-        // For now, try to find by API key pattern or name
-        // In a real implementation, you'd store the Auth0 client ID in the tenant record
-        var allTenants = await _tenantRepository.GetAllAsync();
-        return allTenants.FirstOrDefault(t =>
-            t.ApiKey.Contains(clientId, StringComparison.OrdinalIgnoreCase) ||
-            t.Name.Contains(clientId, StringComparison.OrdinalIgnoreCase));
+        // TODO: Store the Auth0 client ID as an indexed field on the Tenant entity and look up directly.
+        // A full-collection scan is not acceptable in production. This method is disabled until then.
+        throw new NotSupportedException(
+            "GetByClientIdAsync requires a dedicated indexed field (e.g. Auth0ClientId) on Tenant. " +
+            "Add the field, create a MongoDB index, and use a direct Eq filter.");
     }
 
     public async Task<IEnumerable<Tenant>> GetAllAsync()

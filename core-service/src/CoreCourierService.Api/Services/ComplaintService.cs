@@ -1,9 +1,11 @@
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using CoreCourierService.Api.Middleware;
+using CoreCourierService.Core;
 
 namespace CoreCourierService.Api.Services;
 
-public class ComplaintService
+public class ComplaintService : IComplaintService
 {
     private readonly IComplaintRepository _complaintRepository;
     private readonly IShipmentRepository _shipmentRepository;
@@ -29,14 +31,14 @@ public class ComplaintService
         // Verify shipment exists
         var shipment = await _shipmentRepository.GetByTrackingNumberAsync(trackingNumber);
         if (shipment == null)
-            throw new Exception($"Shipment not found: {trackingNumber}");
+            throw new NotFoundException("Shipment", trackingNumber);
 
         var complaint = new Complaint
         {
             TrackingNumber = trackingNumber,
             Type = type,
             Description = description,
-            Status = "Open",
+            Status = ServiceConstants.ComplaintStatuses.Open,
             CustomerEmail = customerEmail,
             CustomerPhone = customerPhone
         };
@@ -81,5 +83,21 @@ public class ComplaintService
     {
         var complaints = await _complaintRepository.GetAllAsync();
         return complaints.ToList();
+    }
+
+    public async Task<long> GetOpenCountAsync()
+    {
+        var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
+        return await _complaintRepository.CountAsync(
+            c => c.TenantId == tenantId && (c.Status == "Open" || c.Status == "InProgress"));
+    }
+
+    public async Task<(IEnumerable<Complaint> complaints, long total)> GetAllPagedAsync(int page, int pageSize)
+    {
+        return await _complaintRepository.GetPagedAsync(
+            filter: null,
+            page: page,
+            pageSize: pageSize,
+            orderBy: c => c.CreatedAt);
     }
 }

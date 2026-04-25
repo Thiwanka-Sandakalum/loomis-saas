@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using CoreCourierService.Api.DTOs;
+using CoreCourierService.Core.Entities;
+using CoreCourierService.Core;
 
 namespace CoreCourierService.Api.Validators
 {
@@ -14,51 +17,57 @@ namespace CoreCourierService.Api.Validators
         {
             var errors = new List<string>();
 
-            // Sender validation
-            if (string.IsNullOrWhiteSpace(request.SenderName))
-                errors.Add("Sender name is required");
-            if (string.IsNullOrWhiteSpace(request.SenderAddress1))
-                errors.Add("Sender address is required");
-            if (string.IsNullOrWhiteSpace(request.SenderCity))
-                errors.Add("Sender city is required");
-            if (string.IsNullOrWhiteSpace(request.SenderCountry))
-                errors.Add("Sender country is required");
-            if (string.IsNullOrWhiteSpace(request.SenderPostalCode))
-                errors.Add("Sender postal code is required");
-            if (string.IsNullOrWhiteSpace(request.SenderPhone))
-                errors.Add("Sender phone is required");
+            if (request.Sender == null)
+            {
+                errors.Add("Sender is required");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(request.Sender.Name))
+                    errors.Add("Sender name is required");
+                if (string.IsNullOrWhiteSpace(request.Sender.Address))
+                    errors.Add("Sender address is required");
+                if (string.IsNullOrWhiteSpace(request.Sender.City))
+                    errors.Add("Sender city is required");
+                if (string.IsNullOrWhiteSpace(request.Sender.Country))
+                    errors.Add("Sender country is required");
+                if (string.IsNullOrWhiteSpace(request.Sender.Phone))
+                    errors.Add("Sender phone is required");
+                else if (!IsValidPhoneNumber(request.Sender.Phone))
+                    errors.Add("Sender phone number format is invalid");
+            }
 
-            // Receiver validation
-            if (string.IsNullOrWhiteSpace(request.ReceiverName))
-                errors.Add("Receiver name is required");
-            if (string.IsNullOrWhiteSpace(request.ReceiverAddress1))
-                errors.Add("Receiver address is required");
-            if (string.IsNullOrWhiteSpace(request.ReceiverCity))
-                errors.Add("Receiver city is required");
-            if (string.IsNullOrWhiteSpace(request.ReceiverCountry))
-                errors.Add("Receiver country is required");
-            if (string.IsNullOrWhiteSpace(request.ReceiverPostalCode))
-                errors.Add("Receiver postal code is required");
-            if (string.IsNullOrWhiteSpace(request.ReceiverPhone))
-                errors.Add("Receiver phone is required");
+            if (request.Receiver == null)
+            {
+                errors.Add("Receiver is required");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(request.Receiver.Name))
+                    errors.Add("Receiver name is required");
+                if (string.IsNullOrWhiteSpace(request.Receiver.Address))
+                    errors.Add("Receiver address is required");
+                if (string.IsNullOrWhiteSpace(request.Receiver.City))
+                    errors.Add("Receiver city is required");
+                if (string.IsNullOrWhiteSpace(request.Receiver.Country))
+                    errors.Add("Receiver country is required");
+                if (string.IsNullOrWhiteSpace(request.Receiver.Phone))
+                    errors.Add("Receiver phone is required");
+                else if (!IsValidPhoneNumber(request.Receiver.Phone))
+                    errors.Add("Receiver phone number format is invalid");
+            }
 
-            // Package validation
-            if (request.Weight <= 0)
-                errors.Add("Weight must be greater than 0");
-            if (request.Weight > 1000)
-                errors.Add("Weight cannot exceed 1000 kg");
-
-            // Validate phone numbers
-            if (!IsValidPhoneNumber(request.SenderPhone))
-                errors.Add("Sender phone number format is invalid");
-            if (!IsValidPhoneNumber(request.ReceiverPhone))
-                errors.Add("Receiver phone number format is invalid");
-
-            // Validate postal codes
-            if (!IsValidPostalCode(request.SenderPostalCode, request.SenderCountry))
-                errors.Add("Sender postal code format is invalid");
-            if (!IsValidPostalCode(request.ReceiverPostalCode, request.ReceiverCountry))
-                errors.Add("Receiver postal code format is invalid");
+            if (request.Parcel == null)
+            {
+                errors.Add("Parcel info is required");
+            }
+            else
+            {
+                if (request.Parcel.Weight <= 0)
+                    errors.Add("Weight must be greater than 0");
+                if (request.Parcel.Weight > 1000)
+                    errors.Add("Weight cannot exceed 1000 kg");
+            }
 
             return new ValidationResult
             {
@@ -107,9 +116,8 @@ namespace CoreCourierService.Api.Validators
             if (string.IsNullOrWhiteSpace(request.Name))
                 errors.Add("Name is required");
 
-            var validRoles = new[] { "Admin", "CSR", "Customer" };
-            if (!validRoles.Contains(request.Role))
-                errors.Add($"Role must be one of: {string.Join(", ", validRoles)}");
+            if (!ServiceConstants.UserRoles.All.Contains(request.Role))
+                errors.Add($"Role must be one of: {string.Join(", ", ServiceConstants.UserRoles.All)}");
 
             return new ValidationResult
             {
@@ -222,23 +230,6 @@ namespace CoreCourierService.Api.Validators
         }
     }
 
-    // Request DTOs (matching what we use)
-    public class CreateShipmentRequest
-    {
-        public string SenderName { get; set; } = string.Empty;
-        public string SenderAddress1 { get; set; } = string.Empty;
-        public string SenderCity { get; set; } = string.Empty;
-        public string SenderCountry { get; set; } = string.Empty;
-        public string SenderPostalCode { get; set; } = string.Empty;
-        public string SenderPhone { get; set; } = string.Empty;
-        public string ReceiverName { get; set; } = string.Empty;
-        public string ReceiverAddress1 { get; set; } = string.Empty;
-        public string ReceiverCity { get; set; } = string.Empty;
-        public string ReceiverCountry { get; set; } = string.Empty;
-        public string ReceiverPostalCode { get; set; } = string.Empty;
-        public string ReceiverPhone { get; set; } = string.Empty;
-        public decimal Weight { get; set; }
-    }
 
     public class CreateRateRequest
     {
