@@ -79,6 +79,19 @@ npm install
 npm run start
 ```
 
+Run with Docker Compose (recommended for quick evaluation):
+
+```bash
+git clone https://github.com/Thiwanka-Sandakalum/loomis-saas.git
+cd loomis-saas
+docker compose up --build
+```
+
+Compose services:
+- `admin-dashboard` (Angular dev server)
+- `core-api` (.NET API)
+- `mongo` (database)
+
 Endpoints:
 - Frontend: http://localhost:4200
 - API Swagger: http://localhost:8080/swagger
