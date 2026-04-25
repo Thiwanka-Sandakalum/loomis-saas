@@ -4,3 +4,5 @@
 core-service/src/CoreCourierService.Api/appsettings.json
 **/*.env
 google-cloud-cli-linux-x86_64.tar.gz
+core-service/image copy.png
+core-service/image.png
