@@ -1,21 +1,24 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using CoreCourierService.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ControllerBase
 {
-    private readonly ShipmentService _shipmentService;
-    private readonly PaymentService _paymentService;
-    private readonly ComplaintService _complaintService;
+    private readonly IShipmentService _shipmentService;
+    private readonly IPaymentService _paymentService;
+    private readonly IComplaintService _complaintService;
 
     public DashboardController(
-        ShipmentService shipmentService,
-        PaymentService paymentService,
-        ComplaintService complaintService)
+        IShipmentService shipmentService,
+        IPaymentService paymentService,
+        IComplaintService complaintService)
     {
         _shipmentService = shipmentService;
         _paymentService = paymentService;
@@ -25,34 +28,23 @@ public class DashboardController : ControllerBase
     [HttpGet("overview")]
     public async Task<IActionResult> GetOverview()
     {
-        // Fetch all data for tenant
-        var shipmentResult = await _shipmentService.GetShipmentsAsync(1, 100000);
-        var allShipments = shipmentResult.shipments.ToList();
-        var allPayments = await _paymentService.GetAllPaymentsAsync();
-        var allComplaints = await _complaintService.GetAllComplaintsAsync();
-
-        var totalShipments = allShipments.Count;
-        var activeShipments = allShipments.Count(s =>
-            s.Status != "Delivered" && s.Status != "Cancelled");
-
-        var totalRevenue = allPayments
-            .Where(p => p.Status == "Completed")
-            .Sum(p => p.Amount);
-
-        var openComplaints = allComplaints.Count(c =>
-            c.Status == "Open" || c.Status == "InProgress");
+        var totalShipments = await _shipmentService.GetTotalCountAsync();
+        var activeShipments = await _shipmentService.GetActiveCountAsync();
+        var deliveredShipments = await _shipmentService.GetCountByStatusAsync("Delivered");
+        var totalRevenue = await _paymentService.GetCompletedRevenueAsync();
+        var openComplaints = await _complaintService.GetOpenCountAsync();
 
         var deliveryRate = totalShipments > 0
-            ? (decimal)allShipments.Count(s => s.Status == "Delivered") / totalShipments * 100
-            : 0;
+            ? Math.Round((decimal)deliveredShipments / totalShipments * 100, 2)
+            : 0m;
 
         var overview = new DashboardOverview
         {
-            TotalShipments = totalShipments,
-            ActiveShipments = activeShipments,
+            TotalShipments = (int)totalShipments,
+            ActiveShipments = (int)activeShipments,
             TotalRevenue = totalRevenue,
-            OpenComplaints = openComplaints,
-            DeliveryRate = Math.Round(deliveryRate, 2)
+            OpenComplaints = (int)openComplaints,
+            DeliveryRate = deliveryRate
         };
 
         return Ok(overview);
@@ -61,7 +53,8 @@ public class DashboardController : ControllerBase
     [HttpGet("shipments/stats")]
     public async Task<IActionResult> GetShipmentStats([FromQuery] string period = "month")
     {
-        var result = await _shipmentService.GetShipmentsAsync(1, 10000);
+        // Limit to 1000 most-recent records; for full analytics use a dedicated aggregation pipeline
+        var result = await _shipmentService.GetShipmentsAsync(1, 1000);
         var allShipments = result.shipments.ToList();
 
         var byStatus = allShipments
@@ -107,9 +100,10 @@ public class DashboardController : ControllerBase
     public async Task<IActionResult> GetRevenueStats([FromQuery] string period = "month")
     {
         var allPayments = await _paymentService.GetAllPaymentsAsync();
-        var completedPayments = allPayments.Where(p => p.Status == "Completed").ToList();
+        var completedPayments = allPayments.Where(p => p.Status == ServiceConstants.PaymentStatuses.Completed).ToList();
 
-        var shipmentResult = await _shipmentService.GetShipmentsAsync(1, 100000);
+        // Limit to 1000 most-recent shipments; for full analytics use a dedicated aggregation pipeline
+        var shipmentResult = await _shipmentService.GetShipmentsAsync(1, 1000);
         var allShipments = shipmentResult.shipments.ToList();
 
         var totalRevenue = completedPayments.Sum(p => p.Amount);

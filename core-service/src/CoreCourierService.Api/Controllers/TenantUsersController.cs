@@ -1,18 +1,22 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using CoreCourierService.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
+using CoreCourierService.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/tenant-users")]
 public class TenantUsersController : ControllerBase
 {
-    private readonly TenantUserService _tenantUserService;
+    private readonly ITenantUserService _tenantUserService;
     private readonly ILogger<TenantUsersController> _logger;
 
     public TenantUsersController(
-        TenantUserService tenantUserService,
+        ITenantUserService tenantUserService,
         ILogger<TenantUsersController> logger)
     {
         _tenantUserService = tenantUserService;
@@ -37,7 +41,9 @@ public class TenantUsersController : ControllerBase
             tu.Status,
             tu.InvitedAt,
             tu.InvitedBy,
-            tu.CreatedAt
+            tu.CreatedAt,
+            null,
+            tu.InvitationExpiresAt
         ));
 
         return Ok(new { data = response });
@@ -55,14 +61,19 @@ public class TenantUsersController : ControllerBase
 
         if (string.IsNullOrEmpty(invitedBy))
         {
-            return Unauthorized(new { error = "User not authenticated" });
+            return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "User not authenticated"));
+        }
+
+        // Validate email format
+        if (string.IsNullOrWhiteSpace(request.Email) || !DomainValidator.IsValidEmail(request.Email))
+        {
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "A valid email address is required"));
         }
 
         // Validate role
-        var validRoles = new[] { "admin", "csr", "customer" };
-        if (!validRoles.Contains(request.Role.ToLower()))
+        if (!ServiceConstants.UserRoles.All.Contains(request.Role.ToLower()))
         {
-            return BadRequest(new { error = "Invalid role. Must be: admin, csr, or customer" });
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invalid role. Must be: admin, csr, or customer"));
         }
 
         var tenantUser = await _tenantUserService.InviteUserAsync(
@@ -81,7 +92,9 @@ public class TenantUsersController : ControllerBase
             tenantUser.Status,
             tenantUser.InvitedAt,
             tenantUser.InvitedBy,
-            tenantUser.CreatedAt
+            tenantUser.CreatedAt,
+            tenantUser.InvitationToken,
+            tenantUser.InvitationExpiresAt
         );
 
         return CreatedAtAction(nameof(GetTenantUsers), new { id = tenantUser.Id }, response);
@@ -99,7 +112,7 @@ public class TenantUsersController : ControllerBase
 
         if (string.IsNullOrEmpty(auth0UserId))
         {
-            return Unauthorized(new { error = "Auth0 user ID not found" });
+            return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Auth0 user ID not found"));
         }
 
         var tenantUser = await _tenantUserService.CreateTenantUserAsync(
@@ -119,7 +132,9 @@ public class TenantUsersController : ControllerBase
             tenantUser.Status,
             tenantUser.InvitedAt,
             tenantUser.InvitedBy,
-            tenantUser.CreatedAt
+            tenantUser.CreatedAt,
+            null,
+            tenantUser.InvitationExpiresAt
         );
 
         return CreatedAtAction(nameof(GetTenantUsers), new { id = tenantUser.Id }, response);
@@ -129,28 +144,21 @@ public class TenantUsersController : ControllerBase
     /// Update a user's role within the tenant
     /// </summary>
     [HttpPatch("{tenantUserId}/role")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> UpdateUserRole(
         string tenantUserId,
         [FromBody] UpdateTenantUserRoleRequest request)
     {
-        // Check if current user is admin
-        var currentRole = HttpContext.Items["Role"]?.ToString();
-        if (currentRole != "admin")
+        if (!ServiceConstants.UserRoles.All.Contains(request.Role.ToLower()))
         {
-            return Forbid();
-        }
-
-        var validRoles = new[] { "admin", "csr", "customer" };
-        if (!validRoles.Contains(request.Role.ToLower()))
-        {
-            return BadRequest(new { error = "Invalid role. Must be: admin, csr, or customer" });
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invalid role. Must be: admin, csr, or customer"));
         }
 
         var success = await _tenantUserService.UpdateUserRoleAsync(tenantUserId, request.Role);
 
         if (!success)
         {
-            return NotFound(new { error = "Tenant user not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant user not found"));
         }
 
         return Ok(new { message = "Role updated successfully" });
@@ -160,20 +168,69 @@ public class TenantUsersController : ControllerBase
     /// Remove a user from the tenant
     /// </summary>
     [HttpDelete("{tenantUserId}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> RemoveUser(string tenantUserId)
     {
-        // Check if current user is admin
-        var currentRole = HttpContext.Items["Role"]?.ToString();
-        if (currentRole != "admin")
-        {
-            return Forbid();
-        }
-
         var success = await _tenantUserService.RemoveUserAsync(tenantUserId);
 
         if (!success)
         {
-            return NotFound(new { error = "Tenant user not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant user not found"));
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Resend a pending invitation (rotates token + resets 7-day expiry)
+    /// </summary>
+    [HttpPost("invite/resend")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+    public async Task<ActionResult<TenantUserResponse>> ResendInvitation(
+        [FromBody] ResendInvitationRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || !DomainValidator.IsValidEmail(request.Email))
+        {
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "A valid email address is required"));
+        }
+
+        var updated = await _tenantUserService.ResendInvitationAsync(request.Email);
+
+        if (updated == null)
+        {
+            return NotFound(ApiErrors.Create("NOT_FOUND", "No pending invitation found for this email"));
+        }
+
+        var response = new TenantUserResponse(
+            updated.Id,
+            updated.Auth0UserId,
+            updated.TenantId,
+            updated.Email,
+            updated.Name,
+            updated.Role,
+            updated.Status,
+            updated.InvitedAt,
+            updated.InvitedBy,
+            updated.CreatedAt,
+            updated.InvitationToken,
+            updated.InvitationExpiresAt
+        );
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Revoke a pending invitation
+    /// </summary>
+    [HttpDelete("invite/{tenantUserId}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+    public async Task<ActionResult> RevokeInvitation(string tenantUserId)
+    {
+        var success = await _tenantUserService.RevokeInvitationAsync(tenantUserId);
+
+        if (!success)
+        {
+            return NotFound(ApiErrors.Create("NOT_FOUND", "No pending invitation found"));
         }
 
         return NoContent();

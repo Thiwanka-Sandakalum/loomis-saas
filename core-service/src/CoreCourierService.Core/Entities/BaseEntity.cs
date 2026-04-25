@@ -7,7 +7,7 @@ public abstract class BaseEntity
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
+    public string Id { get; set; } = string.Empty;
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

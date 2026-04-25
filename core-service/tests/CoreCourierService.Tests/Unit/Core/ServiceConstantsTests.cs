@@ -130,4 +130,45 @@ public class ServiceConstantsTests
         daysUpper.Should().Be(5);
         daysMixed.Should().Be(5);
     }
+
+    // ─── Canonicalize Tests ──────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("standard", "Standard")]
+    [InlineData("STANDARD", "Standard")]
+    [InlineData("StAnDaRd", "Standard")]
+    [InlineData("express", "Express")]
+    [InlineData("EXPRESS", "Express")]
+    [InlineData("overnight", "Overnight")]
+    [InlineData("OVERNIGHT", "Overnight")]
+    public void Canonicalize_KnownServiceType_ReturnsTitleCaseCanonical(string input, string expected)
+    {
+        ServiceConstants.ServiceTypes.Canonicalize(input).Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("  standard  ")]
+    [InlineData("  Express  ")]
+    [InlineData("\tOvernight\t")]
+    public void Canonicalize_TrimsWhitespace(string input)
+    {
+        var result = ServiceConstants.ServiceTypes.Canonicalize(input);
+        ServiceConstants.ServiceTypes.All.Should().Contain(result);
+    }
+
+    [Fact]
+    public void Canonicalize_UnknownInput_ReturnsTrimmedInput()
+    {
+        var result = ServiceConstants.ServiceTypes.Canonicalize("  SameDay  ");
+        result.Should().Be("SameDay");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Canonicalize_NullOrWhiteSpace_ReturnsEmptyString(string? input)
+    {
+        ServiceConstants.ServiceTypes.Canonicalize(input).Should().BeEmpty();
+    }
 }

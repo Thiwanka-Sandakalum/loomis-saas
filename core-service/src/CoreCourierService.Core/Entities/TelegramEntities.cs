@@ -3,6 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace CoreCourierService.Core.Entities;
 
+public record SetupTelegramRequest(
+    string BotToken,
+    string BotUsername,
+    List<string>? AllowedCommands = null,
+    bool AutoReplyEnabled = false,
+    bool ForwardToBrain = true,
+    string? GreetingMessage = null);
+
 public class TelegramChat
 {
     [BsonId]

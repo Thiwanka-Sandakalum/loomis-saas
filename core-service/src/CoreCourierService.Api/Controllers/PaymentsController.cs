@@ -1,16 +1,18 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/payments")]
 public class PaymentsController : ControllerBase
 {
-    private readonly PaymentService _paymentService;
+    private readonly IPaymentService _paymentService;
 
-    public PaymentsController(PaymentService paymentService)
+    public PaymentsController(IPaymentService paymentService)
     {
         _paymentService = paymentService;
     }
@@ -18,20 +20,13 @@ public class PaymentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
     {
-        try
-        {
-            var payment = await _paymentService.CreatePaymentAsync(
-                request.TrackingNumber,
-                request.Amount,
-                request.Method,
-                request.TransactionId);
+        var payment = await _paymentService.CreatePaymentAsync(
+            request.TrackingNumber,
+            request.Amount,
+            request.Method,
+            request.TransactionId);
 
-            return CreatedAtAction(nameof(GetPayment), new { paymentId = payment.Id }, payment);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = new { code = "PAYMENT_ERROR", message = ex.Message } });
-        }
+        return CreatedAtAction(nameof(GetPayment), new { paymentId = payment.Id }, payment);
     }
 
     [HttpGet]
@@ -43,8 +38,8 @@ public class PaymentsController : ControllerBase
             return Ok(new { data = payments, pagination = new { page, pageSize } });
         }
 
-        // TODO: Implement GetAll with pagination
-        return Ok(new { data = new List<object>(), pagination = new { page, pageSize } });
+        var (allPayments, total) = await _paymentService.GetAllPagedAsync(page, pageSize);
+        return Ok(new { data = allPayments, pagination = new { page, pageSize, total } });
     }
 
     [HttpGet("{paymentId}")]
@@ -52,7 +47,7 @@ public class PaymentsController : ControllerBase
     {
         var payment = await _paymentService.GetPaymentByIdAsync(paymentId);
         if (payment == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Payment not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Payment not found"));
 
         return Ok(payment);
     }
@@ -69,7 +64,7 @@ public class PaymentsController : ControllerBase
     {
         var payment = await _paymentService.UpdatePaymentStatusAsync(paymentId, request.Status);
         if (payment == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Payment not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Payment not found"));
 
         return Ok(payment);
     }

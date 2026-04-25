@@ -1,3 +1,4 @@
+using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
 using CoreCourierService.Core.Interfaces;
 
@@ -15,14 +16,12 @@ public class TenantResolverMiddleware
     public async Task InvokeAsync(
         HttpContext context,
         ITenantContext tenantContext,
-        TenantService tenantService,
-        TenantUserService tenantUserService,
+        ITenantService tenantService,
+        ITenantUserService tenantUserService,
         ILogger<TenantResolverMiddleware> logger)
     {
-        var path = context.Request.Path.Value ?? string.Empty;
-
         var auth0UserId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        logger.LogInformation($"TenantResolverMiddleware: User Claims: {string.Join(", ", context.User.Claims.Select(c => $"{c.Type}:{c.Value}"))}");
+
         if (!string.IsNullOrWhiteSpace(auth0UserId))
         {
             var tenantUser = await tenantUserService.GetByAuth0UserIdAsync(auth0UserId);
@@ -33,13 +32,15 @@ public class TenantResolverMiddleware
                 {
                     logger.LogWarning("Tenant {TenantId} not found for user {Auth0UserId}", tenantUser.TenantId, auth0UserId);
                     context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    await context.Response.WriteAsJsonAsync(new { error = "Tenant not found or inactive" });
+                    await context.Response.WriteAsJsonAsync(ApiErrors.Create("FORBIDDEN", "Tenant not found or inactive"));
                     return;
                 }
 
                 tenantContext.SetTenant(tenantUser.TenantId);
                 context.Items["TenantId"] = tenantUser.TenantId;
                 context.Items["TenantPlan"] = tenant.Plan;
+                context.Items["Auth0UserId"] = auth0UserId;
+                context.Items["Role"] = tenantUser.Role;
 
                 await _next(context);
                 return;

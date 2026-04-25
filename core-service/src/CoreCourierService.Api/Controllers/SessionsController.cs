@@ -10,9 +10,9 @@ namespace CoreCourierService.Api.Controllers;
 [Route("api/sessions")]
 public class SessionsController : ControllerBase
 {
-    private readonly SessionService _sessionService;
+    private readonly ISessionService _sessionService;
 
-    public SessionsController(SessionService sessionService)
+    public SessionsController(ISessionService sessionService)
     {
         _sessionService = sessionService;
     }
@@ -50,7 +50,7 @@ public class SessionsController : ControllerBase
         var session = await _sessionService.GetSessionAsync(sessionId);
         if (session == null)
         {
-            return NotFound(new { message = "Session not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Session not found"));
         }
 
         return Ok(new SessionResponse(
@@ -120,7 +120,7 @@ public class SessionsController : ControllerBase
         var session = await _sessionService.UpdateSessionDataAsync(sessionId, request.Data);
         if (session == null)
         {
-            return NotFound(new { message = "Session not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Session not found"));
         }
 
         return Ok(new SessionResponse(
@@ -144,7 +144,7 @@ public class SessionsController : ControllerBase
         var session = await _sessionService.ExtendSessionAsync(sessionId, hours);
         if (session == null)
         {
-            return NotFound(new { message = "Session not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Session not found"));
         }
 
         return Ok(new SessionResponse(
@@ -168,7 +168,7 @@ public class SessionsController : ControllerBase
         var result = await _sessionService.InvalidateSessionAsync(sessionId);
         if (!result)
         {
-            return NotFound(new { message = "Session not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Session not found"));
         }
 
         return Ok(new { message = "Session invalidated successfully" });

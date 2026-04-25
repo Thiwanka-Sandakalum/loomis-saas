@@ -1,10 +1,13 @@
 using CoreCourierService.Api.Middleware;
 using CoreCourierService.Api.Services;
+using CoreCourierService.Api.Configuration;
 using CoreCourierService.Core.Interfaces;
 using CoreCourierService.Infrastructure.Configuration;
 using CoreCourierService.Infrastructure.Context;
 using CoreCourierService.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+DotEnvLoader.LoadFromCurrentPath();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,16 +63,19 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 
 // Register services
-builder.Services.AddScoped<TenantService>();
-builder.Services.AddScoped<ShipmentService>();
-builder.Services.AddScoped<TenantUserService>();
-builder.Services.AddScoped<ShipmentEventService>();
-builder.Services.AddScoped<RateService>();
-builder.Services.AddScoped<PaymentService>();
-builder.Services.AddScoped<ComplaintService>();
-builder.Services.AddScoped<SessionService>();
-builder.Services.AddScoped<TelegramChatService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddScoped<ITenantUserService, TenantUserService>();
+builder.Services.AddScoped<IShipmentEventService, ShipmentEventService>();
+builder.Services.AddScoped<IRateService, RateService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IComplaintService, ComplaintService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<ITelegramChatService, TelegramChatService>();
 builder.Services.AddScoped<AuditService>();
+builder.Services.AddSingleton<TelegramWebhookQueue>();
+builder.Services.AddSingleton<ITelegramWebhookQueue>(sp => sp.GetRequiredService<TelegramWebhookQueue>());
+builder.Services.AddHostedService<TelegramWebhookBackgroundService>();
 builder.Services.AddHttpClient<ITelegramIntegrationService, TelegramIntegrationService>();
 builder.Services.AddHttpClient<ITelegramWebhookHandler, TelegramWebhookHandler>();
 
@@ -79,7 +85,12 @@ builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddHttpContextAccessor();
 
 
-// Add Authentication Services (custom, as in Startup.cs)
+// Add Authentication Services
+var auth0Domain = builder.Configuration["Auth0:Domain"]
+    ?? throw new InvalidOperationException("Auth0:Domain configuration is required");
+var auth0Audience = builder.Configuration["Auth0:Audience"]
+    ?? throw new InvalidOperationException("Auth0:Audience configuration is required");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -87,23 +98,49 @@ builder.Services.AddAuthentication(options =>
 })
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://dev-dtn8wjllia6xrmrl.us.auth0.com/";
-        options.Audience = "https://loomis-main-srv/";
+        options.Authority = auth0Domain;
+        options.Audience = auth0Audience;
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    // Require the Role context item to equal "admin" (set by TenantResolverMiddleware)
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireAssertion(ctx =>
+              {
+                  var httpCtx = ctx.Resource as Microsoft.AspNetCore.Http.HttpContext;
+                  return httpCtx?.Items["Role"]?.ToString() == CoreCourierService.Core.ServiceConstants.UserRoles.Admin;
+              }));
+});
 
 builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
 });
 
+var allowedOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .WithExposedHeaders("X-Correlation-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset");
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .WithExposedHeaders("X-Correlation-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset");
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .WithExposedHeaders("X-Correlation-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset");
+        }
     });
 });
 
@@ -114,29 +151,28 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
+    // Swagger only in development — avoids exposing API schema in production
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreCourierService API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
 // Add global exception middleware for structured error responses
 app.UseMiddleware<CoreCourierService.Api.Middleware.GlobalExceptionMiddleware>();
 
+// Correlation ID must be first so it's available for all downstream logging
+app.UseMiddleware<CoreCourierService.Api.Middleware.CorrelationIdMiddleware>();
+
 app.UseStaticFiles();
 
 app.UseCors();
 
-// Enable Swagger middleware
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreCourierService API V1");
-    c.RoutePrefix = "swagger"; // Serve at /swagger
-});
-
-// Enable authentication middleware
+// Enable authentication & authorization middleware
 app.UseAuthentication();
+app.UseAuthorization();
 
 // Custom middleware (order matters!)
 app.UseMiddleware<TenantResolverMiddleware>();

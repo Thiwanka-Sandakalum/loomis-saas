@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+using CoreCourierService.Api.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CoreCourierService.Api.Middleware;
@@ -53,14 +53,14 @@ public class RateLimitingMiddleware
         // Create cache key
         var cacheKey = $"ratelimit_{tenantId}_{DateTime.UtcNow:yyyyMMddHHmm}";
 
-        // Get or create request count
-        var requestCount = _cache.GetOrCreate(cacheKey, entry =>
+        // Get or create the counter object for this window (stored as a reference type for Interlocked)
+        var counter = _cache.GetOrCreate(cacheKey, entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-            return 0;
-        });
+            return new RateLimitCounter();
+        })!;
 
-        requestCount++;
+        var requestCount = Interlocked.Increment(ref counter.Count);
 
         if (requestCount > limit)
         {
@@ -70,24 +70,27 @@ public class RateLimitingMiddleware
             context.Response.StatusCode = 429; // Too Many Requests
             context.Response.ContentType = "application/json";
 
-            var response = new
-            {
-                error = "Rate limit exceeded",
-                message = $"You have exceeded the rate limit of {limit} requests per minute for your {tenantPlan} plan",
-                retryAfter = 60
-            };
-
-            await context.Response.WriteAsJsonAsync(response);
+            await context.Response.WriteAsJsonAsync(ApiErrors.Create(
+                "RATE_LIMIT_EXCEEDED",
+                $"You have exceeded the rate limit of {limit} requests per minute for your {tenantPlan} plan",
+                new { retryAfterSeconds = 60 }));
             return;
         }
 
-        _cache.Set(cacheKey, requestCount, TimeSpan.FromMinutes(1));
-
         // Add rate limit headers
         context.Response.Headers["X-RateLimit-Limit"] = limit.ToString();
-        context.Response.Headers["X-RateLimit-Remaining"] = (limit - requestCount).ToString();
+        context.Response.Headers["X-RateLimit-Remaining"] = Math.Max(0, limit - requestCount).ToString();
         context.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(1).ToUnixTimeSeconds().ToString();
 
         await _next(context);
     }
+}
+
+/// <summary>
+/// Reference-type wrapper for a rate limit counter so <see cref="System.Threading.Interlocked"/> can
+/// atomically increment it while it lives inside the <see cref="IMemoryCache"/>.
+/// </summary>
+internal sealed class RateLimitCounter
+{
+    public int Count;
 }

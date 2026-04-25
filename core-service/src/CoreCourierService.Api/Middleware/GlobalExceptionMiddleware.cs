@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -15,11 +16,13 @@ namespace CoreCourierService.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<GlobalExceptionMiddleware> _logger;
+        private readonly IWebHostEnvironment _env;
 
-        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> _logger)
+        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IWebHostEnvironment env)
         {
             _next = next;
-            this._logger = _logger;
+            _logger = logger;
+            _env = env;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -93,8 +96,8 @@ namespace CoreCourierService.Api.Middleware
                     errorResponse.Message = "An internal server error occurred";
                     errorResponse.Code = "INTERNAL_ERROR";
 
-                    // Don't expose internal error details in production
-                    if (IsDevelopment())
+                    // Only expose internal details in development
+                    if (_env.IsDevelopment())
                     {
                         errorResponse.Details = new
                         {
@@ -112,11 +115,6 @@ namespace CoreCourierService.Api.Middleware
             });
 
             await response.WriteAsync(json);
-        }
-
-        private bool IsDevelopment()
-        {
-            return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
         }
     }
 

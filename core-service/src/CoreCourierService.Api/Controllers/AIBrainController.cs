@@ -1,25 +1,28 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using CoreCourierService.Core;
 using CoreCourierService.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
 [ApiController]
 [Route("api/ai")]
+[Authorize]
 public class AIBrainController : ControllerBase
 {
-    private readonly ShipmentService _shipmentService;
-    private readonly RateService _rateService;
-    private readonly ComplaintService _complaintService;
-    private readonly ShipmentEventService _eventService;
+    private readonly IShipmentService _shipmentService;
+    private readonly IRateService _rateService;
+    private readonly IComplaintService _complaintService;
+    private readonly IShipmentEventService _eventService;
     private readonly ILogger<AIBrainController> _logger;
 
     public AIBrainController(
-        ShipmentService shipmentService,
-        RateService rateService,
-        ComplaintService complaintService,
-        ShipmentEventService eventService,
+        IShipmentService shipmentService,
+        IRateService rateService,
+        IComplaintService complaintService,
+        IShipmentEventService eventService,
         ILogger<AIBrainController> logger)
     {
         _shipmentService = shipmentService;
@@ -34,6 +37,13 @@ public class AIBrainController : ControllerBase
     {
         try
         {
+            // Validate service type before hitting the service layer
+            var canonicalType = ServiceConstants.ServiceTypes.Canonicalize(request.ServiceType);
+            if (!ServiceConstants.ServiceTypes.All.Contains(canonicalType))
+            {
+                return BadRequest(new { error = $"Invalid service type '{request.ServiceType}'. Valid values: {string.Join(", ", ServiceConstants.ServiceTypes.All)}" });
+            }
+
             // Calculate rate first
             var (cost, _, _, estimatedDelivery) = await _rateService.CalculateRateAsync(
                 request.ServiceType,
@@ -72,11 +82,7 @@ public class AIBrainController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating shipment via AI Brain");
-            return BadRequest(new
-            {
-                success = false,
-                message = $"Failed to create shipment: {ex.Message}"
-            });
+            return BadRequest(ApiErrors.Create("CREATE_SHIPMENT_ERROR", "Failed to create shipment"));
         }
     }
 
@@ -88,12 +94,7 @@ public class AIBrainController : ControllerBase
             var shipment = await _shipmentService.GetByTrackingNumberAsync(trackingNumber);
             if (shipment == null)
             {
-                return NotFound(new
-                {
-                    trackingNumber,
-                    status = "NotFound",
-                    summary = $"No shipment found with tracking number {trackingNumber}."
-                });
+                return NotFound(ApiErrors.Create("NOT_FOUND", "Shipment not found", new { trackingNumber }));
             }
 
             var events = await _eventService.GetEventsByTrackingNumberAsync(trackingNumber);
@@ -125,7 +126,7 @@ public class AIBrainController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error tracking shipment {TrackingNumber}", trackingNumber);
-            return BadRequest(new { summary = $"Error retrieving tracking information: {ex.Message}" });
+            return BadRequest(ApiErrors.Create("TRACKING_ERROR", "Error retrieving tracking information"));
         }
     }
 
@@ -154,7 +155,7 @@ public class AIBrainController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calculating rate");
-            return BadRequest(new { explanation = $"Error calculating rate: {ex.Message}" });
+            return BadRequest(ApiErrors.Create("RATE_INQUIRY_ERROR", "Error calculating rate"));
         }
     }
 
@@ -188,7 +189,7 @@ public class AIBrainController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error filing complaint");
-            return BadRequest(new { message = $"Error filing complaint: {ex.Message}" });
+            return BadRequest(ApiErrors.Create("FILE_COMPLAINT_ERROR", "Error filing complaint"));
         }
     }
 
@@ -248,7 +249,7 @@ public class AIBrainController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error looking up customer");
-            return BadRequest(new { found = false });
+            return BadRequest(ApiErrors.Create("LOOKUP_CUSTOMER_ERROR", "Error looking up customer"));
         }
     }
 

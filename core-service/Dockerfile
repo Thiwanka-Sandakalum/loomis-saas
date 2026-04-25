@@ -1,33 +1,27 @@
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-WORKDIR /app
-EXPOSE 5000
+# syntax=docker/dockerfile:1.7
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy project files
-COPY ["src/CoreCourierService.Api/CoreCourierService.Api.csproj", "src/CoreCourierService.Api/"]
-COPY ["src/CoreCourierService.Core/CoreCourierService.Core.csproj", "src/CoreCourierService.Core/"]
-COPY ["src/CoreCourierService.Infrastructure/CoreCourierService.Infrastructure.csproj", "src/CoreCourierService.Infrastructure/"]
+# Copy project files first for better layer caching
+COPY src/CoreCourierService.Api/CoreCourierService.Api.csproj src/CoreCourierService.Api/
+COPY src/CoreCourierService.Core/CoreCourierService.Core.csproj src/CoreCourierService.Core/
+COPY src/CoreCourierService.Infrastructure/CoreCourierService.Infrastructure.csproj src/CoreCourierService.Infrastructure/
 
-# Restore dependencies
-RUN dotnet restore "src/CoreCourierService.Api/CoreCourierService.Api.csproj"
+RUN dotnet restore src/CoreCourierService.Api/CoreCourierService.Api.csproj
 
-# Copy all source files
+# Copy everything and publish
 COPY . .
+RUN dotnet publish src/CoreCourierService.Api/CoreCourierService.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
 
-# Build
-WORKDIR "/src/src/CoreCourierService.Api"
-RUN dotnet build "CoreCourierService.Api.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "CoreCourierService.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_ENVIRONMENT=Production
+EXPOSE 5000
 
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "CoreCourierService.Api.dll"]

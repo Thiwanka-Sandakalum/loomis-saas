@@ -1,16 +1,8 @@
-# .NET
-bin/
-obj/
-*.user
-*.suo
-*.userprefs
-.vs/
-.vscode/
-*.swp
-*~
-.DS_Store
-
-# Build results
+# ─── .NET build output ───────────────────────────────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 [Dd]ebug/
 [Rr]elease/
 x64/
@@ -18,31 +10,69 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+artifacts/
 
-# NuGet
+# ─── .NET project / solution user files ──────────────────────────────────────
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+*.csproj.user
+project.lock.json
+project.fragment.lock.json
+
+# ─── NuGet ───────────────────────────────────────────────────────────────────
 *.nupkg
 *.snupkg
 packages/
 .nuget/
+nuget.config.user
 
-# Test
+# ─── Test results & coverage ─────────────────────────────────────────────────
 TestResults/
 *.trx
 *.coverage
 *.coveragexml
+coverage.cobertura.xml
+coverage-report/
+lcov.info
 
-# Environment
+# ─── Environment & secrets ───────────────────────────────────────────────────
 .env
 .env.local
+.env.*.local
+*.pfx
+*.key
+*.pem
+secrets.json
 appsettings.Development.json
-appsettings.*.json
+appsettings.Local.json
+appsettings.Staging.json
+appsettings.Production.json
 !appsettings.json
+!appsettings.example.json
 
-# IDEs
+# ─── Docker ──────────────────────────────────────────────────────────────────
+.dockerignore.local
+
+# ─── CI artifacts ────────────────────────────────────────────────────────────
+*.tar.gz
+*.zip
+*.nupkg
+
+# ─── IDEs ────────────────────────────────────────────────────────────────────
+.vs/
+.vscode/
 .idea/
 *.sln.iml
 *.code-workspace
+*.suo
+*.cache
+
+# ─── OS ──────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~

@@ -20,6 +20,10 @@ public record UpdateTenantUserRoleRequest(
     string Role
 );
 
+public record ResendInvitationRequest(
+    string Email
+);
+
 public record TenantUserResponse(
     string Id,
     string Auth0UserId,
@@ -30,5 +34,7 @@ public record TenantUserResponse(
     string Status,
     DateTime? InvitedAt,
     string? InvitedBy,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    string? InvitationToken = null,
+    DateTime? InvitationExpiresAt = null
 );

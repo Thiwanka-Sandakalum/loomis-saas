@@ -1,9 +1,11 @@
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using CoreCourierService.Api.Middleware;
+using CoreCourierService.Core;
 
 namespace CoreCourierService.Api.Services;
 
-public class PaymentService
+public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IShipmentRepository _shipmentRepository;
@@ -24,14 +26,14 @@ public class PaymentService
         // Verify shipment exists
         var shipment = await _shipmentRepository.GetByTrackingNumberAsync(trackingNumber);
         if (shipment == null)
-            throw new Exception($"Shipment not found: {trackingNumber}");
+            throw new NotFoundException("Shipment", trackingNumber);
 
         var payment = new Payment
         {
             TrackingNumber = trackingNumber,
             Amount = amount,
             Method = method,
-            Status = "Pending",
+            Status = ServiceConstants.PaymentStatuses.Pending,
             TransactionId = transactionId
         };
 
@@ -67,5 +69,22 @@ public class PaymentService
     {
         var payments = await _paymentRepository.GetAllAsync();
         return payments.ToList();
+    }
+
+    public async Task<decimal> GetCompletedRevenueAsync()
+    {
+        var tenantId = _tenantContext.TenantId ?? throw new InvalidOperationException("TenantId not set");
+        var completed = await _paymentRepository.FindAsync(
+            p => p.TenantId == tenantId && p.Status == "Completed");
+        return completed.Sum(p => p.Amount);
+    }
+
+    public async Task<(IEnumerable<Payment> payments, long total)> GetAllPagedAsync(int page, int pageSize)
+    {
+        return await _paymentRepository.GetPagedAsync(
+            filter: null,
+            page: page,
+            pageSize: pageSize,
+            orderBy: p => p.CreatedAt);
     }
 }

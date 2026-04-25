@@ -57,4 +57,16 @@ public class TenantUser : BaseEntity
     /// </summary>
     [BsonElement("invited_by")]
     public string? InvitedBy { get; set; }
+
+    /// <summary>
+    /// Invitation token used to securely accept tenant membership.
+    /// </summary>
+    [BsonElement("invitation_token")]
+    public string? InvitationToken { get; set; }
+
+    /// <summary>
+    /// UTC expiry for the invitation token.
+    /// </summary>
+    [BsonElement("invitation_expires_at")]
+    public DateTime? InvitationExpiresAt { get; set; }
 }

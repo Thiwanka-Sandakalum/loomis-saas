@@ -2,24 +2,26 @@ using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
 using CoreCourierService.Core.Entities;
 using CoreCourierService.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/onboarding")]
 public class OnboardingController : ControllerBase
 {
-    private readonly TenantService _tenantService;
-    private readonly TenantUserService _tenantUserService;
-    private readonly RateService _rateService;
+    private readonly ITenantService _tenantService;
+    private readonly ITenantUserService _tenantUserService;
+    private readonly IRateService _rateService;
     private readonly ITenantContext _tenantContext;
     private readonly ILogger<OnboardingController> _logger;
 
     public OnboardingController(
-        TenantService tenantService,
-        TenantUserService tenantUserService,
-        RateService rateService,
+        ITenantService tenantService,
+        ITenantUserService tenantUserService,
+        IRateService rateService,
         ITenantContext tenantContext,
         ILogger<OnboardingController> logger)
     {
@@ -40,23 +42,23 @@ public class OnboardingController : ControllerBase
         {
             if (string.IsNullOrWhiteSpace(request.CompanyName))
             {
-                return BadRequest(new { error = "Company name is required" });
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Company name is required"));
             }
 
             if (string.IsNullOrWhiteSpace(request.Plan))
             {
-                return BadRequest(new { error = "Plan is required" });
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Plan is required"));
             }
 
             if (request.EnabledServices == null || request.EnabledServices.Count == 0)
             {
-                return BadRequest(new { error = "Enabled services are required" });
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Enabled services are required"));
             }
 
             // Get Auth0 user ID from authenticated user claims (set by Auth0 middleware)
             if (!User.Identity?.IsAuthenticated ?? true)
             {
-                return Unauthorized(new { error = "Missing Auth0 JWT token" });
+                return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Missing Auth0 JWT token"));
             }
 
             var auth0UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -65,14 +67,14 @@ public class OnboardingController : ControllerBase
 
             if (string.IsNullOrEmpty(auth0UserId))
             {
-                return Unauthorized(new { error = "Invalid Auth0 token - missing user ID" });
+                return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Invalid Auth0 token - missing user ID"));
             }
 
             // Check if user already belongs to a tenant
             var existingTenantUser = await _tenantUserService.GetByAuth0UserIdAsync(auth0UserId);
             if (existingTenantUser != null)
             {
-                return BadRequest(new { error = "User already belongs to a tenant", tenantId = existingTenantUser.TenantId });
+                return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "User already belongs to a tenant", new { tenantId = existingTenantUser.TenantId }));
             }
 
             // Create new tenant
@@ -103,17 +105,6 @@ public class OnboardingController : ControllerBase
                 createdTenant.Id, auth0UserId);
 
             // Create tenant user mapping as admin
-            var tenantUser = new TenantUser
-            {
-                Auth0UserId = auth0UserId,
-                TenantId = createdTenant.Id,
-                Email = email,
-                Name = name,
-                Role = "admin", // First user is always admin
-                Status = "active",
-                InvitedAt = DateTime.UtcNow
-            };
-
             await _tenantUserService.CreateTenantUserAsync(
                 auth0UserId,
                 email,
@@ -140,7 +131,7 @@ public class OnboardingController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during tenant setup");
-            return StatusCode(500, new { error = "Failed to setup tenant", details = ex.Message });
+            return StatusCode(500, ApiErrors.Create("INTERNAL_ERROR", "Failed to setup tenant"));
         }
     }
 
@@ -150,24 +141,50 @@ public class OnboardingController : ControllerBase
     [HttpPost("accept-invite")]
     public async Task<ActionResult> AcceptInvitation([FromBody] AcceptInviteRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.InvitationToken))
+        {
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invitation token is required"));
+        }
+
         // Get Auth0 user ID from authenticated user claims
         if (!User.Identity?.IsAuthenticated ?? true)
         {
-            return Unauthorized(new { error = "Missing Auth0 JWT token" });
+            return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Missing Auth0 JWT token"));
         }
 
         var auth0UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(auth0UserId))
         {
-            return Unauthorized(new { error = "Invalid Auth0 token" });
+            return Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Invalid Auth0 token"));
         }
 
-        // TODO: Look up pending invitation by email and token
-        // Update invitation status from "invited" to "active"
-        // Link Auth0UserId to existing tenant_user record
+        // Email is required to match the pending invitation record
+        var email = User.FindFirst("email")?.Value;
+        if (string.IsNullOrEmpty(email))
+        {
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Email claim missing from token. Ensure the email is included in your Auth0 token."));
+        }
 
-        return Ok(new { message = "Invitation accepted - implementation pending" });
+        // Check if user already belongs to a tenant (already accepted or self-registered)
+        var existing = await _tenantUserService.GetByAuth0UserIdAsync(auth0UserId);
+        if (existing != null && !existing.Auth0UserId.StartsWith("pending_"))
+        {
+            return BadRequest(ApiErrors.Create("ALREADY_MEMBER", "User already belongs to a tenant", new { tenantId = existing.TenantId }));
+        }
+
+        var tenantUser = await _tenantUserService.AcceptInvitationAsync(auth0UserId, email, request.InvitationToken);
+        if (tenantUser == null)
+        {
+            return NotFound(ApiErrors.Create("NOT_FOUND", "No pending invitation found for this email address and token"));
+        }
+
+        return Ok(new
+        {
+            message = "Invitation accepted successfully",
+            tenantId = tenantUser.TenantId,
+            role = tenantUser.Role
+        });
     }
 
     /// <summary>
@@ -185,13 +202,13 @@ public class OnboardingController : ControllerBase
         var profileErrors = ValidateCompanyProfile(request);
         if (profileErrors.Count > 0)
         {
-            return BadRequest(new { error = new { code = "VALIDATION_ERROR", details = profileErrors } });
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invalid company profile", profileErrors));
         }
 
         var tenantUser = await _tenantUserService.GetByAuth0UserIdAsync(auth0UserId!);
         if (tenantUser == null)
         {
-            return NotFound(new { error = "Tenant user not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant user not found"));
         }
 
         var profile = new CompanyProfile
@@ -208,7 +225,7 @@ public class OnboardingController : ControllerBase
         var updatedTenant = await _tenantService.UpdateCompanyProfileAsync(tenantUser.TenantId, profile);
         if (updatedTenant == null)
         {
-            return NotFound(new { error = "Tenant not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant not found"));
         }
 
         return Ok(new OnboardingStatusResponse(
@@ -234,19 +251,19 @@ public class OnboardingController : ControllerBase
         var rateErrors = ValidateOnboardingRates(request);
         if (rateErrors.Count > 0)
         {
-            return BadRequest(new { error = new { code = "VALIDATION_ERROR", details = rateErrors } });
+            return BadRequest(ApiErrors.Create("VALIDATION_ERROR", "Invalid onboarding rates", rateErrors));
         }
 
         var tenantUser = await _tenantUserService.GetByAuth0UserIdAsync(auth0UserId!);
         if (tenantUser == null)
         {
-            return NotFound(new { error = "Tenant user not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant user not found"));
         }
 
         var tenant = await _tenantService.GetByIdAsync(tenantUser.TenantId);
         if (tenant == null)
         {
-            return NotFound(new { error = "Tenant not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant not found"));
         }
 
 
@@ -267,7 +284,7 @@ public class OnboardingController : ControllerBase
         var updatedTenant = await _tenantService.MarkRatesCompletedAsync(tenantUser.TenantId);
         if (updatedTenant == null)
         {
-            return NotFound(new { error = "Tenant not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant not found"));
         }
 
         return Ok(new OnboardingStatusResponse(
@@ -319,7 +336,7 @@ public class OnboardingController : ControllerBase
         var tenant = await _tenantService.GetByIdAsync(tenantUser.TenantId);
         if (tenant == null)
         {
-            return NotFound(new { error = "Tenant not found" });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Tenant not found"));
         }
 
         return Ok(new OnboardingStatusResponse(
@@ -334,19 +351,13 @@ public class OnboardingController : ControllerBase
     {
         if (!User.Identity?.IsAuthenticated ?? true)
         {
-            return (null, Unauthorized(new { error = "Missing Auth0 JWT token" }));
+            return (null, Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Missing Auth0 JWT token")));
         }
 
         var auth0UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        // Defensive: If user is authenticated, but sub is missing, try to get from HttpContext.Items (set by TenantResolver)
         if (string.IsNullOrEmpty(auth0UserId))
         {
-            if (HttpContext.Items.TryGetValue("TenantId", out var tenantIdObj) && tenantIdObj is string tenantId && !string.IsNullOrEmpty(tenantId))
-            {
-                // Use tenantId as fallback (not ideal, but prevents false negatives)
-                return (tenantId, null);
-            }
-            return (null, Unauthorized(new { error = "Invalid Auth0 token - missing user ID" }));
+            return (null, Unauthorized(ApiErrors.Create("UNAUTHORIZED", "Invalid Auth0 token - missing user ID")));
         }
         return (auth0UserId, null);
     }

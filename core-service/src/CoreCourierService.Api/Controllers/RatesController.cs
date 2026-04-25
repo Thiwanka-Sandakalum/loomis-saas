@@ -1,18 +1,22 @@
 using CoreCourierService.Api.DTOs;
 using CoreCourierService.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCourierService.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/rates")]
 public class RatesController : ControllerBase
 {
-    private readonly RateService _rateService;
+    private readonly IRateService _rateService;
+    private readonly ILogger<RatesController> _logger;
 
-    public RatesController(RateService rateService)
+    public RatesController(IRateService rateService, ILogger<RatesController> logger)
     {
         _rateService = rateService;
+        _logger = logger;
     }
 
     [HttpPost]
@@ -40,7 +44,7 @@ public class RatesController : ControllerBase
     {
         var rate = await _rateService.GetRateByIdAsync(rateId);
         if (rate == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Rate not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Rate not found"));
 
         return Ok(rate);
     }
@@ -56,7 +60,7 @@ public class RatesController : ControllerBase
             request.MaxWeight);
 
         if (rate == null)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Rate not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Rate not found"));
 
         return Ok(rate);
     }
@@ -66,7 +70,7 @@ public class RatesController : ControllerBase
     {
         var deleted = await _rateService.DeleteRateAsync(rateId);
         if (!deleted)
-            return NotFound(new { error = new { code = "NOT_FOUND", message = "Rate not found" } });
+            return NotFound(ApiErrors.Create("NOT_FOUND", "Rate not found"));
 
         return NoContent();
     }
@@ -94,7 +98,8 @@ public class RatesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = new { code = "CALCULATION_ERROR", message = ex.Message } });
+            _logger.LogError(ex, "Error calculating rate");
+            return BadRequest(ApiErrors.Create("CALCULATION_ERROR", "Unable to calculate rate for the given parameters"));
         }
     }
 }

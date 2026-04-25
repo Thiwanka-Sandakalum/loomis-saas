@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace CoreCourierService.Tests.Integration;
 
+[Trait("Category", "Integration")]
 public class RatesControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
@@ -33,7 +34,7 @@ public class RatesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         var result = await response.Content.ReadFromJsonAsync<RateCalculationResponse>();
         result.Should().NotBeNull();
         result!.ServiceType.Should().Be("Standard");
-        result.Cost.Should().BeGreaterThan(0);
+        result.Total.Should().BeGreaterThan(0);
     }
 
     [Fact(Skip = "Integration test - requires MongoDB")]
@@ -52,17 +53,4 @@ public class RatesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-}
-
-public class CalculateRateRequest
-{
-    public decimal Weight { get; set; }
-    public string ServiceType { get; set; } = string.Empty;
-}
-
-public class RateCalculationResponse
-{
-    public string ServiceType { get; set; } = string.Empty;
-    public decimal Cost { get; set; }
-    public string EstimatedDelivery { get; set; } = string.Empty;
 }
