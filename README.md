@@ -2,7 +2,7 @@
 
 Production-grade microservices platform for courier operations, with an Angular admin frontend, .NET backend services, and an independently deployed AI service.
 
-![Backend CI](https://img.shields.io/github/actions/workflow/status/Thiwanka-Sandakalum/loomis-saas/backend-ci.yml?style=flat-square&label=backend%20ci)
+[![Backend CI](https://img.shields.io/github/actions/workflow/status/Thiwanka-Sandakalum/loomis-saas/backend-ci.yml?branch=main&style=flat-square&label=backend%20ci)](https://github.com/Thiwanka-Sandakalum/loomis-saas/actions/workflows/backend-ci.yml)
 ![.NET](https://img.shields.io/badge/.NET-10-purple?style=flat-square)
 ![Angular](https://img.shields.io/badge/Angular-21-red?style=flat-square)
 ![Azure Container Apps](https://img.shields.io/badge/Azure-Container%20Apps-0078D4?style=flat-square)
